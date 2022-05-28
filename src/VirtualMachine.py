@@ -9,3 +9,9 @@ class VirtualMachine:
         self.loader = Loader()
         self.dumper = Dumper()
         self.linker = Linker()
+
+        self.pc
+        self.ri
+        self.accumulator
+        
+        self.memory
