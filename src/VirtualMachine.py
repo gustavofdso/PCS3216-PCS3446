@@ -1,4 +1,3 @@
-from re import L
 from src.Assembler import Assembler
 from src.Loader import Loader
 from src.Dumper import Dumper
