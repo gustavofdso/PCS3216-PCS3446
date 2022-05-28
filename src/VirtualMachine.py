@@ -8,7 +8,7 @@ from src.Linker import Linker
 class VirtualMachine:
     def __init__(self):
         # Initializing CPU
-        self.CPU = CPU
+        self.CPU = CPU()
 
         # Initializing system programms
         self.assembler = Assembler()
