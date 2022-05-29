@@ -81,15 +81,17 @@ class VirtualMachine:
         operand = self.instruction_register & 0xFFF
         self.accumulator *= self.get_from_memory(operand)
         
-    # Divide value from memory from accumulator
+    # Divide accumulator by value from memory
     def _divide(self):
         operand = self.instruction_register & 0xFFF
         self.accumulator //= self.get_from_memory(operand)
 
+    # Load accumulator with value from memory
     def _load(self):
         operand = self.instruction_register & 0xFFF
         self.accumulator = self.get_from_memory(operand)
 
+    # Move accumulator to memory
     def _move_to_memory(self):
         pass
 
