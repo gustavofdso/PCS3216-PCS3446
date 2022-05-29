@@ -34,6 +34,10 @@ class VirtualMachine:
     def hex_dump(self, start_position, end_position):
         pass
 
+    # Get data from memory
+    def get_from_memory(self, adress):
+        pass
+
     # Defining machine instructions
 
     # Inconditional jump to addresss
@@ -57,25 +61,26 @@ class VirtualMachine:
     # Add value from memory to accumulator
     def _add(self):
         operand = self.instruction_register & 0xFFF
-        self.accumulator += operand
+        self.accumulator += self.get_from_memory(operand)
 
     # Subtract value from memory from accumulator
     def _sub(self):
         operand = self.instruction_register & 0xFFF
-        self.accumulator -= operand
+        self.accumulator -= self.get_from_memory(operand)
 
     # Multiply value from memory by accumulator
     def _multiply(self):
         operand = self.instruction_register & 0xFFF
-        self.accumulator *= operand
+        self.accumulator *= self.get_from_memory(operand)
         
     # Divide value from memory from accumulator
     def _divide(self):
         operand = self.instruction_register & 0xFFF
-        self.accumulator //= operand
+        self.accumulator //= self.get_from_memory(operand)
 
     def _load(self):
-        pass
+        operand = self.instruction_register & 0xFFF
+        self.accumulator = self.get_from_memory(operand)
 
     def _move_to_memory(self):
         pass
