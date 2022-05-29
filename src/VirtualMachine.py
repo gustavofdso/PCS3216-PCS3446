@@ -1,8 +1,6 @@
 from src.CPU import CPU
 
 from src.Assembler import Assembler
-from src.Loader import Loader
-from src.Dumper import Dumper
 from src.Linker import Linker
 
 class VirtualMachine:
@@ -12,7 +10,16 @@ class VirtualMachine:
 
         # Initializing system programms
         self.assembler = Assembler()
-        self.loader = Loader()
-        self.dumper = Dumper()
         self.linker = Linker()
 
+    def load(self):
+        pass
+
+    def dump(self):
+        pass
+
+    def hex_dump(self):
+        pass
+
+    def run(self):
+        pass
