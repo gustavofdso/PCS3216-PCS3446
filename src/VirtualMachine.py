@@ -1,5 +1,3 @@
-from src.CPU import CPU
-
 from src.Assembler import Assembler
 from src.Linker import Linker
 
@@ -7,9 +5,6 @@ from ctypes import c_uint8, c_uint16, c_int8
 
 class VirtualMachine:
     def __init__(self, banks = 16, bank_size = 4096):
-        # Initializing CPU
-        self.CPU = CPU()
-
         # Initializing system memory
         self.current_bank = c_uint8(0)
         self.indirect_mode = False
