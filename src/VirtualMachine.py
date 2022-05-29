@@ -25,6 +25,7 @@ class VirtualMachine:
         self.assembler = Assembler()
         self.linker = Linker()
 
+    # Defining machine basic funcionalities
     def load(self, file):
         pass
 
