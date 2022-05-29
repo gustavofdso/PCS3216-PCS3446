@@ -59,7 +59,7 @@ class VirtualMachine:
         
     def _divide(self):
         operand = self.instruction_register & 0xFFF
-        self.accumulator /= operand
+        self.accumulator //= operand
 
     def _load(self):
         pass
