@@ -3,6 +3,9 @@ from src.Linker import Linker
 
 from ctypes import c_uint8, c_uint16, c_int8
 
+class VirtualMachineError(Exception):
+    pass
+
 class VirtualMachine:
     def __init__(self, banks = 16, bank_size = 4096):
         # Initializing system memory
@@ -77,7 +80,17 @@ class VirtualMachine:
         pass
 
     def _get_data(self):
-        pass
+        operand = (self.current_instruction & 0x0F00) >> 8
+        op_type = operand >> 2
+        device = operand & 0x3
+
+        if self.io_devices[device][0] is None:
+            raise VirtualMachineError('Tried to get data from inexistent device')
+        try:
+            self.accumulator = ord(self.io_devices[device][0].read(1))
+        except TypeError:
+            logger.warning('TypeError!')
+            pass
 
     def _put_data(self):
         pass
