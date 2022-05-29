@@ -86,5 +86,8 @@ class VirtualMachine:
         pass
 
     # Defining execution algorithm 
+    def fetch_instruction(self):
+        pass
+
     def run(self):
         pass
