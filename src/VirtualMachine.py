@@ -86,11 +86,8 @@ class VirtualMachine:
 
         if self.io_devices[device][0] is None:
             raise VirtualMachineError('Tried to get data from inexistent device')
-        try:
-            self.accumulator = ord(self.io_devices[device][0].read(1))
-        except TypeError:
-            logger.warning('TypeError!')
-            pass
+        self.accumulator = ord(self.io_devices[device][0].read(1))
+
 
     def _put_data(self):
         pass
