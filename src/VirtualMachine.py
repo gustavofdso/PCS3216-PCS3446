@@ -36,7 +36,15 @@ class VirtualMachine:
 
     # Get data from memory
     def get_from_memory(self, adress):
-        pass
+        if self.indirect_mode:
+            addr = self.memory[self.current_bank][adress].value << 8 | self.memory[self.current_bank][adress + 1].value
+            addr &= 0xFFF
+        else:
+            addr = adress
+
+        self.indirect_mode = False
+
+        return self.memory[self.current_bank][addr].value
 
     # Defining machine instructions
 
