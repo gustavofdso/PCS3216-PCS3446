@@ -12,6 +12,7 @@ class VirtualMachine:
         self.memory = [[c_uint8(0) for i in range(bank_size)] for j in range(banks)]
         
         # Initializing system registers
+        self.program_counter = c_uint16(0)
         self.instruction_register = c_uint16(0)
         self.instruction_counter = c_uint16(0)
         self.accumulator = c_int8(0)
@@ -31,52 +32,55 @@ class VirtualMachine:
         pass
 
     # Defining machine instructions
-    def _jump(self, instruction):
-        pass
+    def _jump(self):
+        operand = self.instruction_register & 0xFFF
+        self.program_counter = operand
 
-    def _jump_if_zero(self, instruction):
-        pass
+    def _jump_if_zero(self):
+        if self.accumulator == 0:
+            self._jump()
 
-    def _jump_if_negative(self, instruction):
+    def _jump_if_negative(self):
+        if self.accumulator < 0:
+            self._jump()
+        
+    def _load_value(self):
         pass
         
-    def _load_value(self, instruction):
+    def _add(self):
+        pass
+
+    def _sub(self):
+        pass
+
+    def _multiply(self):
         pass
         
-    def _add(self, instruction):
+    def _divide(self):
         pass
 
-    def _sub(self, instruction):
+    def _load(self):
         pass
 
-    def _multiply(self, instruction):
+    def _move_to_memory(self):
+        pass
+
+    def _subroutine_call(self):
         pass
         
-    def _divide(self, instruction):
-        pass
-
-    def _load(self, instruction):
-        pass
-
-    def _move_to_memory(self, instruction):
-        pass
-
-    def _subroutine_call(self, instruction):
+    def _return_from_subroutine(self):
         pass
         
-    def _return_from_subroutine(self, instruction):
-        pass
-        
-    def _halt_machine(self, instruction):
+    def _halt_machine(self):
         pass
 
-    def _get_data(self, instruction):
+    def _get_data(self):
         pass
 
-    def _put_data(self, instruction):
+    def _put_data(self):
         pass
         
-    def _operating_system(self, instruction):
+    def _operating_system(self):
         pass
 
     # Defining execution algorithm 
