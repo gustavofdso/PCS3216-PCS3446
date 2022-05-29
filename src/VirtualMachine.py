@@ -35,31 +35,41 @@ class VirtualMachine:
         pass
 
     # Defining machine instructions
+
+    # Inconditional jump to addresss
     def _jump(self):
         operand = self.instruction_register & 0xFFF
         self.program_counter = operand
 
+    # Jump to addresss if accumulator is zero
     def _jump_if_zero(self):
         if self.accumulator == 0: self._jump()
 
+    # Jump to addresss if accumulator is negative
     def _jump_if_negative(self):
         if self.accumulator < 0: self._jump()
         
+    # Load value to accumulator
     def _load_value(self):
-        pass
+        operand = self.instruction_register & 0x0FF
+        self.accumulator = operand
         
+    # Add value from memory to accumulator
     def _add(self):
         operand = self.instruction_register & 0xFFF
         self.accumulator += operand
 
+    # Subtract value from memory from accumulator
     def _sub(self):
         operand = self.instruction_register & 0xFFF
         self.accumulator -= operand
 
+    # Multiply value from memory by accumulator
     def _multiply(self):
         operand = self.instruction_register & 0xFFF
         self.accumulator *= operand
         
+    # Divide value from memory from accumulator
     def _divide(self):
         operand = self.instruction_register & 0xFFF
         self.accumulator //= operand
@@ -80,14 +90,7 @@ class VirtualMachine:
         pass
 
     def _get_data(self):
-        operand = (self.current_instruction & 0x0F00) >> 8
-        op_type = operand >> 2
-        device = operand & 0x3
-
-        if self.io_devices[device][0] is None:
-            raise VirtualMachineError('Tried to get data from inexistent device')
-        self.accumulator = ord(self.io_devices[device][0].read(1))
-
+        pass
 
     def _put_data(self):
         pass
