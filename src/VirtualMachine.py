@@ -37,27 +37,29 @@ class VirtualMachine:
         self.program_counter = operand
 
     def _jump_if_zero(self):
-        if self.accumulator == 0:
-            self._jump()
+        if self.accumulator == 0: self._jump()
 
     def _jump_if_negative(self):
-        if self.accumulator < 0:
-            self._jump()
+        if self.accumulator < 0: self._jump()
         
     def _load_value(self):
         pass
         
     def _add(self):
-        pass
+        operand = self.instruction_register & 0xFFF
+        self.accumulator += operand
 
     def _sub(self):
-        pass
+        operand = self.instruction_register & 0xFFF
+        self.accumulator -= operand
 
     def _multiply(self):
-        pass
+        operand = self.instruction_register & 0xFFF
+        self.accumulator *= operand
         
     def _divide(self):
-        pass
+        operand = self.instruction_register & 0xFFF
+        self.accumulator /= operand
 
     def _load(self):
         pass
