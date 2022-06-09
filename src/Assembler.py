@@ -1,4 +1,4 @@
-
+import os
 from ctypes import c_uint8, c_uint16, c_int8
 
 class AssemblyError(Exception):
@@ -8,22 +8,22 @@ class Assembler:
     
     def __init__(self):
         self.mnemonics_table = {
-            "JP": (0x0, 2),
-            "JZ": (0x1, 2),
-            "JN": (0x2, 2),
-            "LV": (0x3, 1),
-            "+" : (0x4, 2), 
-            "-" : (0x5, 2), 
-            "*" : (0x6, 2), 
-            "/" : (0x7, 2),
-            "LD": (0x8, 2),
-            "MM": (0x9, 2),
-            "SC": (0xA, 2),
-            "RS": (0xB, 1),
-            "HM": (0xC, 1),
-            "GD": (0xD, 1),
-            "PD": (0xE, 1),
-            "OS": (0xF, 1),
+            "JP": 0x0,
+            "JZ": 0x1,
+            "JN": 0x2,
+            "LV": 0x3,
+            "+" : 0x4,
+            "-" : 0x5,
+            "*" : 0x6,
+            "/" : 0x7,
+            "LD": 0x8,
+            "MM": 0x9,
+            "SC": 0xA,
+            "RS": 0xB,
+            "HM": 0xC,
+            "GD": 0xD,
+            "PD": 0xE,
+            "OS": 0xF,
         }
 
         self.pseudoinstrucions = ['@', '#', '$', 'K', '&', '>', '<']
@@ -45,3 +45,5 @@ class Assembler:
             if instruction == '': continue
             
             lines.append((i, instruction, comment))
+
+        save_path = '\\object\\' + '.'.join(filename.split('.')[:-1]) + 'obj'
