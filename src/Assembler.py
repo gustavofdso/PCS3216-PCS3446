@@ -41,40 +41,43 @@ class Assembler:
         lines = pd.DataFrame(columns = ['label', 'command', 'operator'])
         for line in file_lines:
             content = line.split(';', maxsplit = 1)[0].strip().split()
+            if len(content) == 0: continue
+            if len(content) > 3: raise AssemblyError('Too many symbols: ' + content)
+
+            label, command, operator = '', '', ''
 
             # Separating labels, commands and operators
-            if len(content) == 0: continue
-            elif len(content) == 1:
-                label = content[0]
-                command = ''
-                operator = ''
-            elif len(content) == 2:
-                if content[0] in self.mnemonic_table['mnemonic'] or content[0] in self.pseudoinstructions:
-                    label = ''
-                    command = content[0]
-                    operator = content[1]
-                else:
-                    label = content[0]
-                    command = content[1]
-                    operator = ''
-            elif len(content) == 3:
-                label = content[0]
-                command = content[1]
-                operator = content[2]
-            else: raise AssemblyError('Too many symbols: ' + content)
+            if content[0] in self.mnemonic_table['mnemonic'] or content[0] in self.pseudoinstructions:
+                if len(content) >= 1: command = content[0]
+                if len(content) == 2: operator = content[1]
+            else:
+                if len(content) >= 1: label = content[0]
+                if len(content) >= 2: command = content[1]
+                if len(content) == 3: operator = content[2]
 
             lines.loc[lines.shape[0]] = [label, command, operator]
 
-        labels = pd.DataFrame(columns = ['label', 'address'])
+        labels = pd.DataFrame(columns = ['label', 'isRelocable', 'isExternal', 'address'])
+
+        if not ('@' in lines['label'] ^ '&' in lines['label']): raise AssemblyError('Program must be either absolute or relocable')
 
         # First assembly step
-        instruction_counter = 0
         for i in lines.index:
             label = lines.at[i, 'label']
             command = lines.at[i, 'command']
             operator = lines.at[i, 'operator']
 
-            instruction_counter += 1
+            if label == '': continue
+
+            if label == '<':
+                isRelocable = False
+                isExternal = True
+            else:
+                if '@' in lines['label']: isRelocable = False
+                elif '&' in lines['label']: isRelocable = True
+                isExternal = False
+
+            labels.loc[lines.shape[0]] = [label, isRelocable, isExternal, 2*i]
 
         # Second assembly step
         instruction_counter = 0
