@@ -10,7 +10,26 @@ class AssemblyError(Exception):
 class Assembler:
     
     def __init__(self):
-        pass
+        self.mnemonic_table = pd.DataFrame(
+            (
+                ('JP', 0x0),
+                ('JZ', 0x1),
+                ('JN', 0x2),
+                ('LV', 0x3),
+                ('+' , 0x4),
+                ('-' , 0x5),
+                ('*' , 0x6),
+                ('/' , 0x7),
+                ('LD', 0x8),
+                ('MM', 0x9),
+                ('SC', 0xA),
+                ('RS', 0xB),
+                ('HM', 0xC),
+                ('GD', 0xD),
+                ('PD', 0xE),
+                ('OS', 0xF)
+            ), columns = ['mnemonic', 'opcode']
+        )
 
     def assemble(self, filename):
 
@@ -18,24 +37,34 @@ class Assembler:
         with open(filename, 'r') as f: file_lines = f.readlines()
 
         # Separating commands from comments
-        lines = pd.DataFrame(columns = ['command', 'comment'])
+        lines = pd.DataFrame(columns = ['label', 'command', 'operator', 'comment'])
         for line in file_lines:
+            # Separating comments
             if ';' in line:
-                command = line.split(';', maxsplit = 1)[0].strip()
+                content = line.split(';', maxsplit = 1)[0].strip()
                 comment = line.split(';', maxsplit = 1)[1].strip()
             else:
-                command = line.strip()
+                content = line.strip()
                 comment = ''
 
-            lines.loc[lines.shape[0]] = [command, comment]
+            # Separating labels, commands and operators
+            if len(content.split()) == 2:
+                label = ''
+                command = content.split()[0]
+                operator = content.split()[1]
+            elif len(content.split()) == 3:
+                label = content.split()[0]
+                command = content.split()[1]
+                operator = content.split()[2]
+            else: raise AssemblyError('Too many mnemonics: ' + content)
+            
+            lines.loc[lines.shape[0]] = [label, command, operator, comment]
 
         labels = pd.DataFrame(columns = ['label', 'address'])
 
         # First assembly step
         instruction_counter = 0
         for i in lines.index:
-            command = lines.at[i, 'command']
-            splited_command = command.split()
 
             instruction_counter += 1
 
@@ -45,40 +74,3 @@ class Assembler:
 
     def binary_from_instruction(self, command, operator = None):
         splited_command = command.split()
-
-        # No code
-        if len(splited_command) == 0: return ''
-
-        if splited_command[0] == 'JP':
-
-        elif splited_command[0] == 'JZ':
-
-        elif splited_command[0] == 'JN':
-
-        elif splited_command[0] == 'LV':
-
-        elif splited_command[0] == '+':
-
-        elif splited_command[0] == '-':
-
-        elif splited_command[0] == '*':
-
-        elif splited_command[0] == '/':
-
-        elif splited_command[0] == 'LD':
-
-        elif splited_command[0] == 'MM':
-
-        elif splited_command[0] == 'SC':
-
-        elif splited_command[0] == 'RS':
-
-        elif splited_command[0] == 'HM':
-
-        elif splited_command[0] == 'GD':
-
-        elif splited_command[0] == 'PD':
-
-        elif splited_command[0] == 'OS':
-
-        else: raise AssemblyError('Unknown command: ' + command)
