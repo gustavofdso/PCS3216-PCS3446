@@ -4,8 +4,7 @@ from numpy import insert
 import pandas as pd
 from ctypes import c_uint8, c_uint16, c_int8
 
-class AssemblyError(Exception):
-    pass
+class AssemblyError(Exception): pass
 
 class Assembler:
     
@@ -31,46 +30,59 @@ class Assembler:
             ), columns = ['mnemonic', 'opcode']
         )
 
+        self.pseudoinstructions = ['@', '#', '$', 'K', '&', '>', '<']
+
     def assemble(self, filename):
 
         # Opening the file and reading lines
         with open(filename, 'r') as f: file_lines = f.readlines()
 
         # Separating commands from comments
-        lines = pd.DataFrame(columns = ['label', 'command', 'operator', 'comment'])
+        lines = pd.DataFrame(columns = ['label', 'command', 'operator'])
         for line in file_lines:
-            # Separating comments
-            if ';' in line:
-                content = line.split(';', maxsplit = 1)[0].strip()
-                comment = line.split(';', maxsplit = 1)[1].strip()
-            else:
-                content = line.strip()
-                comment = ''
+            content = line.split(';', maxsplit = 1)[0].strip().split()
 
             # Separating labels, commands and operators
-            if len(content.split()) == 2:
-                label = ''
-                command = content.split()[0]
-                operator = content.split()[1]
-            elif len(content.split()) == 3:
-                label = content.split()[0]
-                command = content.split()[1]
-                operator = content.split()[2]
-            else: raise AssemblyError('Too many mnemonics: ' + content)
-            
-            lines.loc[lines.shape[0]] = [label, command, operator, comment]
+            if len(content) == 0: continue
+            elif len(content) == 1:
+                label = content[0]
+                command = ''
+                operator = ''
+            elif len(content) == 2:
+                if content[0] in self.mnemonic_table['mnemonic'] or content[0] in self.pseudoinstructions:
+                    label = ''
+                    command = content[0]
+                    operator = content[1]
+                else:
+                    label = content[0]
+                    command = content[1]
+                    operator = ''
+            elif len(content) == 3:
+                label = content[0]
+                command = content[1]
+                operator = content[2]
+            else: raise AssemblyError('Too many symbols: ' + content)
+
+            lines.loc[lines.shape[0]] = [label, command, operator]
 
         labels = pd.DataFrame(columns = ['label', 'address'])
 
         # First assembly step
         instruction_counter = 0
         for i in lines.index:
+            label = lines.at[i, 'label']
+            command = lines.at[i, 'command']
+            operator = lines.at[i, 'operator']
 
             instruction_counter += 1
 
         # Second assembly step
+        instruction_counter = 0
+        for i in lines.index:
+            label = lines.at[i, 'label']
+            command = lines.at[i, 'command']
+            operator = lines.at[i, 'operator']
 
-        save_path = r'\\object\\' + '.'.join(filename.split('.')[:-1]) + '.obj'
+            instruction_counter += 1
 
-    def binary_from_instruction(self, command, operator = None):
-        splited_command = command.split()
+        save_path = r'\\object\\' + '.'.join(filename.split('.')[:-1]) + 'obj'
