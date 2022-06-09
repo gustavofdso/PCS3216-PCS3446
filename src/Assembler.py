@@ -1,4 +1,6 @@
+from dis import Instruction
 import os
+from numpy import insert
 import pandas as pd
 from ctypes import c_uint8, c_uint16, c_int8
 
@@ -8,70 +10,75 @@ class AssemblyError(Exception):
 class Assembler:
     
     def __init__(self):
-
-
-        self.pseudoinstrucions_list = ['@', '#', '$', 'K', '&', '>', '<']
+        pass
 
     def assemble(self, filename):
 
         # Opening the file and reading lines
-        with open(filename, 'r') as f:
-            file_lines = f.readlines()
+        with open(filename, 'r') as f: file_lines = f.readlines()
 
         # Separating commands from comments
-        lines = pd.DataFrame(columns = ['instruction', 'comment'])
+        lines = pd.DataFrame(columns = ['command', 'comment'])
         for line in file_lines:
             if ';' in line:
-                instruction = line.split(';', maxsplit = 1)[0].strip()
+                command = line.split(';', maxsplit = 1)[0].strip()
                 comment = line.split(';', maxsplit = 1)[1].strip()
             else:
-                instruction = line.strip()
+                command = line.strip()
                 comment = ''
 
-            lines.loc[lines.shape[0]] = [instruction, comment]
+            lines.loc[lines.shape[0]] = [command, comment]
 
-        # Executing assembly steps
-        for step in [1, 2]:
-            instruction_counter = 0
+        labels = pd.DataFrame(columns = ['label', 'address'])
 
-            for i in lines.index:
-                binary = self.binary_from_instruction(instruction)
-                instruction_counter += 1
+        # First assembly step
+        instruction_counter = 0
+        for i in lines.index:
+            command = lines.at[i, 'command']
+            splited_command = command.split()
 
-        save_path = '\\object\\' + '.'.join(filename.split('.')[:-1]) + 'obj'
+            instruction_counter += 1
 
-    def binary_from_instruction(self, instruction):
-        splited_instruction = instruction.split()
-        if len(splited_instruction) == 0: return ''
+        # Second assembly step
 
-        if splited_instruction[0] == 'JP':
+        save_path = r'\\object\\' + '.'.join(filename.split('.')[:-1]) + '.obj'
 
-        elif splited_instruction[0] == 'JZ':
+    def binary_from_instruction(self, command, operator = None):
+        splited_command = command.split()
 
-        elif splited_instruction[0] == 'JN':
+        # No code
+        if len(splited_command) == 0: return ''
 
-        elif splited_instruction[0] == 'LV':
+        if splited_command[0] == 'JP':
 
-        elif splited_instruction[0] == '+':
+        elif splited_command[0] == 'JZ':
 
-        elif splited_instruction[0] == '-':
+        elif splited_command[0] == 'JN':
 
-        elif splited_instruction[0] == '*':
+        elif splited_command[0] == 'LV':
 
-        elif splited_instruction[0] == '/':
+        elif splited_command[0] == '+':
 
-        elif splited_instruction[0] == 'LD':
+        elif splited_command[0] == '-':
 
-        elif splited_instruction[0] == 'MM':
+        elif splited_command[0] == '*':
 
-        elif splited_instruction[0] == 'SC':
+        elif splited_command[0] == '/':
 
-        elif splited_instruction[0] == 'RS':
-            
-        elif splited_instruction[0] == 'HM':
+        elif splited_command[0] == 'LD':
 
-        elif splited_instruction[0] == 'GD':
+        elif splited_command[0] == 'MM':
 
-        elif splited_instruction[0] == 'PD':
+        elif splited_command[0] == 'SC':
 
-        elif splited_instruction[0] == 'OS':
+        elif splited_command[0] == 'RS':
+
+        elif splited_command[0] == 'HM':
+
+        elif splited_command[0] == 'GD':
+
+        elif splited_command[0] == 'PD':
+
+        elif splited_command[0] == 'OS':
+
+        else: raise AssemblyError('Unknown command: ' + command)
