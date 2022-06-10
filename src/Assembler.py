@@ -60,7 +60,7 @@ class Assembler:
 
             lines.loc[lines.shape[0]] = [label, command, operator]
 
-        labels = pd.DataFrame(columns = ['label', 'isRelocable', 'isExternal', 'address'])
+        labels = pd.DataFrame(columns = ['label', 'isRelocable', 'isExternal', 'adress'])
 
         if not ('@' in lines['command'].to_list()) ^ ('&' in lines['command'].to_list()): raise AssemblyError('Program must be either absolute or relocable')
 
@@ -68,7 +68,7 @@ class Assembler:
         elif '&' in lines['command'].to_list(): start_adress = lines[lines['command'] == '&']['operator'].iloc[-1]
 
         # First assembly step - building label table
-        relative_adress = 0
+        instruction_counter = 0
         for i in lines.index:
             label = lines.at[i, 'label']
             command = lines.at[i, 'command']
@@ -84,12 +84,10 @@ class Assembler:
                 if '@' in lines['command'].to_list(): isRelocable = False
                 elif '&' in lines['command'].to_list(): isRelocable = True
                 isExternal = False
-                adress = start_adress + relative_adress
-                relative_adress += 2
+                adress = start_adress + instruction_counter
+                instruction_counter += 2
 
             labels.loc[labels.shape[0]] = [label, isRelocable, isExternal, adress]
-        
-        print(lines, labels)
 
         # Second assembly step - building instructions
         instruction_counter = 0
@@ -98,6 +96,16 @@ class Assembler:
             command = lines.at[i, 'command']
             operator = lines.at[i, 'operator']
 
-            instruction_counter += 1
+            if command in self.pseudoinstructions:
+                # TODO: implement isso
+                pass
+            elif command in self.mnemonic_table['mnemonic'].to_list():
+                opcode = self.mnemonic_table.set_index('mnemonic').at[command, 'opcode']
+            else: raise AssemblyError('Bad instruction: ' + command)
 
-        save_path = r'./object/' + '.'.join(filename.split('.')[:-1]) + 'obj'
+            if operator in labels['label'].to_list():
+                print(operator)
+                operator = labels.set_index('label').at[operator, 'adress']
+                print(operator)
+
+        save_path = './object/' + '.'.join(filename.split('.')[:-1]) + 'obj'
