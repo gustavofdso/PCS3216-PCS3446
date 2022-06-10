@@ -1,3 +1,7 @@
-from src.VirtualMachine import VirtualMachine
+# from src.VirtualMachine import VirtualMachine
 
-virtualmachine = VirtualMachine()
+# virtualmachine = VirtualMachine()
+
+from src.Assembler import Assembler
+
+Assembler().assemble('./source/somador.txt')

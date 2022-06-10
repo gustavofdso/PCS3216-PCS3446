@@ -1,6 +1,4 @@
-from dis import Instruction
 import os
-from numpy import insert
 import pandas as pd
 from ctypes import c_uint8, c_uint16, c_int8
 
@@ -33,11 +31,11 @@ class Assembler:
         self.pseudoinstructions = ['@', '#', '$', 'K', '&', '>', '<']
 
     def assemble(self, filename):
-
         # Opening the file and reading lines
         with open(filename, 'r') as f: file_lines = f.readlines()
 
         # Separating commands from comments
+        # TODO: tratar os > para serem o label seguinte
         lines = pd.DataFrame(columns = ['label', 'command', 'operator'])
         for line in file_lines:
             content = line.split(';', maxsplit = 1)[0].strip().split()
@@ -47,7 +45,7 @@ class Assembler:
             label, command, operator = '', '', ''
 
             # Separating labels, commands and operators
-            if content[0] in self.mnemonic_table['mnemonic'] or content[0] in self.pseudoinstructions:
+            if content[0] in self.mnemonic_table['mnemonic'].to_list() or content[0] in self.pseudoinstructions:
                 if len(content) >= 1: command = content[0]
                 if len(content) == 2: operator = content[1]
             else:
@@ -55,13 +53,22 @@ class Assembler:
                 if len(content) >= 2: command = content[1]
                 if len(content) == 3: operator = content[2]
 
+            if operator != '':
+                if operator[0] == '=': operator = int(operator[1:], 10)
+                elif operator[0] == '#': operator = int(operator[1:], 2)
+                elif operator[0] == '/': operator = int(operator[1:], 16)
+
             lines.loc[lines.shape[0]] = [label, command, operator]
 
         labels = pd.DataFrame(columns = ['label', 'isRelocable', 'isExternal', 'address'])
 
-        if not ('@' in lines['label'] ^ '&' in lines['label']): raise AssemblyError('Program must be either absolute or relocable')
+        if not ('@' in lines['command'].to_list()) ^ ('&' in lines['command'].to_list()): raise AssemblyError('Program must be either absolute or relocable')
 
-        # First assembly step
+        if '@' in lines['command'].to_list(): start_adress = lines[lines['command'] == '@']['operator'].iloc[-1]
+        elif '&' in lines['command'].to_list(): start_adress = lines[lines['command'] == '&']['operator'].iloc[-1]
+
+        # First assembly step - building label table
+        relative_adress = 0
         for i in lines.index:
             label = lines.at[i, 'label']
             command = lines.at[i, 'command']
@@ -69,17 +76,22 @@ class Assembler:
 
             if label == '': continue
 
-            if label == '<':
+            if command == '<':
                 isRelocable = False
                 isExternal = True
+                adress = '?'
             else:
-                if '@' in lines['label']: isRelocable = False
-                elif '&' in lines['label']: isRelocable = True
+                if '@' in lines['command'].to_list(): isRelocable = False
+                elif '&' in lines['command'].to_list(): isRelocable = True
                 isExternal = False
+                adress = start_adress + relative_adress
+                relative_adress += 2
 
-            labels.loc[lines.shape[0]] = [label, isRelocable, isExternal, 2*i]
+            labels.loc[labels.shape[0]] = [label, isRelocable, isExternal, adress]
+        
+        print(lines, labels)
 
-        # Second assembly step
+        # Second assembly step - building instructions
         instruction_counter = 0
         for i in lines.index:
             label = lines.at[i, 'label']
@@ -88,4 +100,4 @@ class Assembler:
 
             instruction_counter += 1
 
-        save_path = r'\\object\\' + '.'.join(filename.split('.')[:-1]) + 'obj'
+        save_path = r'./object/' + '.'.join(filename.split('.')[:-1]) + 'obj'
