@@ -4,4 +4,4 @@
 
 from src.Assembler import Assembler
 
-Assembler().assemble('soma.txt')
+Assembler().assemble('soma')

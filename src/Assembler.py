@@ -26,11 +26,10 @@ class Assembler:
                 ('OS', 0xF)
             ), columns = ['mnemonic', 'opcode']
         )
-        self.pseudoinstructions = ['@', '#', '$', 'K']
 
     def assemble(self, filename):
         # Opening the file and reading lines
-        with open('./object/' + filename + '.asm', 'r') as f:
+        with open('./source/' + filename + '.asm', 'r') as f:
             file_lines = f.readlines()
             f.close()
 
@@ -45,7 +44,7 @@ class Assembler:
             label, command, operator = '', '', ''
 
             # Separating labels, commands and operators
-            if content[0] in self.mnemonic_table['mnemonic'].to_list() or content[0] in self.pseudoinstructions:
+            if content[0] in self.mnemonic_table['mnemonic'].to_list() or content[0] in ['@', '$', 'K']:
                 if len(content) >= 1: command = content[0]
                 if len(content) == 2: operator = content[1]
             else:
@@ -94,15 +93,19 @@ class Assembler:
                 for i in range(operator):
                     concat = ''.zfill(16)
                     obj_code += concat + '\n'
+
             # Reserving byte with value
             elif command == 'K':
                 concat = '{0:b}'.format(operator).zfill(16) + '\n'
                 obj_code += concat
+
             # Regular instruction
             elif command in self.mnemonic_table['mnemonic'].to_list():
                 opcode = self.mnemonic_table.set_index('mnemonic').at[command, 'opcode']
                 concat = '{0:b}'.format(opcode).zfill(4) + '{0:b}'.format(operator).zfill(12) + '\n'
                 obj_code += concat
+
+            # If not valid instruction, assembly error
             else: raise AssemblyError('Bad instruction: ' + command)
 
         # Saving binary to object file
