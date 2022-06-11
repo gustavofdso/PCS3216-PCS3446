@@ -1,5 +1,5 @@
-from src.Assembler import Assembler
-from src.Linker import Linker
+
+
 
 from ctypes import c_uint8, c_uint16, c_int8
 
@@ -7,6 +7,9 @@ class VirtualMachineError(Exception):
     pass
 
 class VirtualMachine:
+    from src.assemble import assemble
+    from src.link import link
+
     def __init__(self, banks = 16, bank_size = 4096):
         # Initializing system memory
         self.current_bank = c_uint8(0)
@@ -19,10 +22,6 @@ class VirtualMachine:
         self.instruction_register = c_uint16(0)
         self.instruction_counter = c_uint16(0)
         self.accumulator = c_int8(0)
-
-        # Initializing system programms
-        self.assembler = Assembler()
-        self.linker = Linker()
 
     # Defining machine basic funcionalities
     def load(self, file):

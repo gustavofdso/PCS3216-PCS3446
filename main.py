@@ -2,6 +2,6 @@
 
 # virtualmachine = VirtualMachine()
 
-from src.Assembler import Assembler
+from src.assemble import assemble
 
-Assembler().assemble('soma')
+assemble('soma')
