@@ -22,10 +22,7 @@ class VirtualMachine:
 
     # Defining machine basic funcionalities
     from src.load import load
-    from src.dump import dump
-
-    def hex_dump(self, start_position, end_position):
-        pass
+    from src.dump import dump, hex_dump
 
     # Get data from memory
     def get_from_memory(self, adress):

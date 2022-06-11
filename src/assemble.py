@@ -18,7 +18,6 @@ def assemble(self, filename):
         f.close()
 
     # Separating commands from comments
-    # TODO: tratar os > para serem o label seguinte
     lines = pd.DataFrame(columns = ['label', 'command', 'operator'])
     for line in file_lines:
         content = line.split(';', maxsplit = 1)[0].strip().split()
