@@ -4,4 +4,4 @@
 
 from src.Assembler import Assembler
 
-Assembler().assemble('./source/somador.txt')
+Assembler().assemble('soma.txt')

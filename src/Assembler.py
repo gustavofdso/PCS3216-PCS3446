@@ -5,7 +5,6 @@ from ctypes import c_uint8, c_uint16, c_int8
 class AssemblyError(Exception): pass
 
 class Assembler:
-    
     def __init__(self):
         self.mnemonic_table = pd.DataFrame(
             (
@@ -27,12 +26,13 @@ class Assembler:
                 ('OS', 0xF)
             ), columns = ['mnemonic', 'opcode']
         )
-
-        self.pseudoinstructions = ['@', '#', '$', 'K', '&', '>', '<']
+        self.pseudoinstructions = ['@', '#', '$', 'K']
 
     def assemble(self, filename):
         # Opening the file and reading lines
-        with open(filename, 'r') as f: file_lines = f.readlines()
+        with open('./object/' + filename + '.asm', 'r') as f:
+            file_lines = f.readlines()
+            f.close()
 
         # Separating commands from comments
         # TODO: tratar os > para serem o label seguinte
@@ -60,52 +60,52 @@ class Assembler:
 
             lines.loc[lines.shape[0]] = [label, command, operator]
 
-        labels = pd.DataFrame(columns = ['label', 'isRelocable', 'isExternal', 'adress'])
+        labels = pd.DataFrame(columns = ['label', 'adress'])
 
-        if not ('@' in lines['command'].to_list()) ^ ('&' in lines['command'].to_list()): raise AssemblyError('Program must be either absolute or relocable')
+        if not '@' in lines['command'].to_list(): raise AssemblyError('Program must have an start adress')
 
-        if '@' in lines['command'].to_list(): start_adress = lines[lines['command'] == '@']['operator'].iloc[-1]
-        elif '&' in lines['command'].to_list(): start_adress = lines[lines['command'] == '&']['operator'].iloc[-1]
+        start_adress = lines[lines['command'] == '@']['operator'].iloc[-1]
 
         # First assembly step - building label table
         instruction_counter = 0
         for i in lines.index:
-            label = lines.at[i, 'label']
-            command = lines.at[i, 'command']
-            operator = lines.at[i, 'operator']
+            label, command, operator = lines.at[i, 'label'], lines.at[i, 'command'], lines.at[i, 'operator']
 
             if label == '': continue
 
-            if command == '<':
-                isRelocable = False
-                isExternal = True
-                adress = '?'
-            else:
-                if '@' in lines['command'].to_list(): isRelocable = False
-                elif '&' in lines['command'].to_list(): isRelocable = True
-                isExternal = False
-                adress = start_adress + instruction_counter
-                instruction_counter += 2
+            # Getting label adress
+            adress = start_adress + instruction_counter
+            if command == '$': instruction_counter += operator + operator % 2
+            else: instruction_counter += 2
 
-            labels.loc[labels.shape[0]] = [label, isRelocable, isExternal, adress]
+            labels.loc[labels.shape[0]] = [label, adress]
 
-        # Second assembly step - building instructions
-        instruction_counter = 0
+        # Second assembly step - assembling instructions
+        obj_code = ''
         for i in lines.index:
-            label = lines.at[i, 'label']
-            command = lines.at[i, 'command']
-            operator = lines.at[i, 'operator']
+            label, command, operator = lines.at[i, 'label'], lines.at[i, 'command'], lines.at[i, 'operator']
+            if operator in labels['label'].to_list(): operator = labels.set_index('label').at[operator, 'adress']
+            
+            # Pseudo-instructions
+            if command == '@': pass
 
-            if command in self.pseudoinstructions:
-                # TODO: implement isso
-                pass
+            # Reserving memory space with zero
+            elif command == '$':
+                for i in range(operator):
+                    concat = ''.zfill(16)
+                    obj_code += concat + '\n'
+            # Reserving byte with value
+            elif command == 'K':
+                concat = '{0:b}'.format(operator).zfill(16) + '\n'
+                obj_code += concat
+            # Regular instruction
             elif command in self.mnemonic_table['mnemonic'].to_list():
                 opcode = self.mnemonic_table.set_index('mnemonic').at[command, 'opcode']
+                concat = '{0:b}'.format(opcode).zfill(4) + '{0:b}'.format(operator).zfill(12) + '\n'
+                obj_code += concat
             else: raise AssemblyError('Bad instruction: ' + command)
 
-            if operator in labels['label'].to_list():
-                print(operator)
-                operator = labels.set_index('label').at[operator, 'adress']
-                print(operator)
-
-        save_path = './object/' + '.'.join(filename.split('.')[:-1]) + 'obj'
+        # Saving binary to object file
+        with open('./object/' + filename + '.obj', 'w') as f:
+            f.write(obj_code)
+            f.close()
