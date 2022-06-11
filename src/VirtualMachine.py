@@ -17,7 +17,6 @@ class VirtualMachine:
         # Initializing system registers
         self.program_counter = c_uint16(0)
         self.instruction_register = c_uint16(0)
-        self.instruction_counter = c_uint16(0)
         self.accumulator = c_int8(0)
 
     # Defining machine basic funcionalities

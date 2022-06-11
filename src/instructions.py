@@ -13,7 +13,7 @@ def _jump_if_negative(self):
     
 # Load value to accumulator
 def _load_value(self):
-    operand = self.instruction_register & 0x0FF
+    operand = self.instruction_register & 0xFF
     self.accumulator = operand
     
 # Add value from memory to accumulator
@@ -43,10 +43,28 @@ def _load(self):
 
 # Move accumulator to memory
 def _move_to_memory(self):
-    pass
+    operand = self.current_instruction & 0xFFF
+
+    if self.indirect_mode:
+        addr = self.memory[self.current_bank][operand].value << 8 | self.memory[self.current_bank][operand + 1].value
+        bank = addr >> 12
+        addr &= 0xFFF
+    else:
+        bank = self.current_bank
+        addr = operand
+
+    self.indirect_mode = False
+
+    self.memory[bank][addr].value = self.accumulator
 
 def _subroutine_call(self):
-    pass
+    operand = self.current_instruction & 0xFFF
+    next_instr = self.program_counter
+
+    self.memory[self.current_bank][operand].value = next_instr >> 8
+    self.memory[self.current_bank][operand + 1].value = next_instr & 0xFF
+
+    self.program_counter = operand + 2
     
 def _return_from_subroutine(self):
     pass
