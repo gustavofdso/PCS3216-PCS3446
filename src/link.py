@@ -1,2 +1,2 @@
-def link():
+def link(self):
     pass

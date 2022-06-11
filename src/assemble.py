@@ -2,7 +2,7 @@ import pandas as pd
 
 class AssemblyError(Exception): pass
 
-def assemble(filename):
+def assemble(self, filename):
     mnemonic_table = pd.DataFrame(
         (
             ('JP', 0x0), ('JZ', 0x1), ('JN', 0x2), ('LV', 0x3),
