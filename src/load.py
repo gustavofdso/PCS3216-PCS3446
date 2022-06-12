@@ -8,9 +8,12 @@ def load(self, filename):
 
     obj_code = ''.join(file_lines)
     adress = int(obj_code[0:7], 2)
-    i = 0
+    i = 1
     while True:
+        # Checking for last byte
         if 8*i + 7 >= len(obj_code): break
+
+        # Saving byte to memory
         line = obj_code[8*i: 8*i + 7]
         self.memory[self.current_bank][adress + i] = c_uint8(line)
         i += 1
