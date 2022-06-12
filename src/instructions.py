@@ -1,3 +1,5 @@
+from ctypes import c_int8
+
 # Inconditional jump to addresss
 def _jump(self):
     operand = self.instruction_register & 0xFFF
@@ -43,7 +45,7 @@ def _load(self):
 
 # Move accumulator to memory
 def _move_to_memory(self):
-    operand = self.current_instruction & 0xFFF
+    operand = self.instruction_register & 0xFFF
 
     if self.indirect_mode:
         addr = self.memory[self.current_bank][operand].value << 8 | self.memory[self.current_bank][operand + 1].value
@@ -58,7 +60,7 @@ def _move_to_memory(self):
     self.memory[bank][addr].value = self.accumulator
 
 def _subroutine_call(self):
-    operand = self.current_instruction & 0xFFF
+    operand = self.instruction_register & 0xFFF
     next_instr = self.program_counter
 
     self.memory[self.current_bank][operand].value = next_instr >> 8
@@ -70,13 +72,33 @@ def _return_from_subroutine(self):
     pass
     
 def _halt_machine(self):
-    pass
+    operand = (self.instruction_register & 0x0F00) >> 8
+
+    if operand == 0:
+        print('Machine halted! ^C to interrupt execution!')
+        while True:
+            try: pass
+            except KeyboardInterrupt: self.running = False
+
+    elif operand == 1: self.indirect_mode = True
+    elif operand == 2: self.indirect_mode = False
 
 def _get_data(self):
-    pass
+    self.accumulator = c_int8(input('Enter data: '))
 
 def _put_data(self):
-    pass
+    print('ACC => {1:04d}'.format(self.accumulator.value))
     
 def _operating_system(self):
-    pass
+    operand = (self.instruction_register & 0x0F00) >> 8
+
+    # Dump current state to stdout
+    if operand == 0b0000:
+        print('-- Current VM State')
+        print('ACC => {0: 04d}'.format(self.accumulator.value))
+        print('PC  => {0: #05x}'.format(self.program_counter.value))
+        print('RI  => {0: #05x}'.format(self.instruction_register.value))
+
+    # Finish execution
+    elif operand == 0b1111:
+        self.running = False

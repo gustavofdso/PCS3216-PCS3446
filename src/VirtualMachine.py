@@ -47,5 +47,10 @@ class VirtualMachine:
     def fetch_instruction(self):
         pass
 
-    def run(self):
-        pass
+    def run(self, step = True):
+        self.instruction_register = self.main_memory[0][0x022].value << 8 | self.main_memory[0][0x023].value
+        self.running = True
+        while self.running:
+            self.fetch_instruction()
+            self.decode_execute()
+            if step: input()
