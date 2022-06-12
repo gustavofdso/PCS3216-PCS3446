@@ -7,13 +7,11 @@ def load(self, filename):
         f.close()
 
     obj_code = ''.join(file_lines)
-    adress = int(obj_code[0:7], 2)
-    i = 1
-    while True:
-        # Checking for last byte
-        if 8*i + 7 >= len(obj_code): break
-
+    splitted_code = [obj_code[i: i + 8] for i in range(0, len(obj_code), 8)]
+    
+    adress = int(splitted_code[0], 2)
+    relative_adress = 0
+    for i in splitted_code[1:]:
         # Saving byte to memory
-        line = obj_code[8*i: 8*i + 7]
-        self.memory[self.current_bank][adress + i] = c_uint8(line)
-        i += 1
+        self.memory[self.current_bank][adress + relative_adress] = c_uint8(i)
+        relative_adress += 1
