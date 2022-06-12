@@ -27,13 +27,15 @@ def assemble(self, filename):
         label, command, operator = '', '', ''
 
         # Separating labels, commands and operators
-        if content[0] in mnemonic_table['mnemonic'].to_list() or content[0] in ['@', '$', 'K']:
-            if len(content) >= 1: command = content[0]
-            if len(content) == 2: operator = content[1]
-        else:
-            if len(content) >= 1: label = content[0]
-            if len(content) >= 2: command = content[1]
-            if len(content) == 3: operator = content[2]
+        try:
+            if content[0] in mnemonic_table['mnemonic'].to_list() or content[0] in ['@', '$', 'K', '#']:
+                command = content[0]
+                operator = content[1]
+            else:
+                label = content[0]
+                command = content[1]
+                operator = content[2]
+        except Exception: pass
 
         if operator != '':
             if operator[0] == '=': operator = int(operator[1:], 10)
@@ -57,7 +59,7 @@ def assemble(self, filename):
 
         # Getting label adress
         adress = start_adress + instruction_counter
-        if command == '$': instruction_counter += min(2, operator + operator%2)
+        if command == '$': instruction_counter += operator
         else: instruction_counter += 2
 
         labels.loc[labels.shape[0]] = [label, adress]
@@ -69,24 +71,25 @@ def assemble(self, filename):
         if operator in labels['label'].to_list(): operator = labels.set_index('label').at[operator, 'adress']
         
         # Pseudo-instructions
-        if command == '@': pass
+        if command == '@':
+            obj_code += '{0:b}'.format(operator).zfill(8) + '\n'
 
         # Reserving memory space with zero
         elif command == '$':
             for i in range(operator):
-                concat = ''.zfill(16)
-                obj_code += concat + '\n'
+                obj_code += ''.zfill(8) + '\n'
 
         # Reserving byte with value
         elif command == 'K':
-            concat = '{0:b}'.format(operator).zfill(16) + '\n'
-            obj_code += concat
+            obj_code +='{0:b}'.format(operator).zfill(8) + '\n'
+
+        elif command == '#':
+            break
 
         # Regular instruction
         elif command in mnemonic_table['mnemonic'].to_list():
             opcode = mnemonic_table.set_index('mnemonic').at[command, 'opcode']
-            concat = '{0:b}'.format(opcode).zfill(4) + '{0:b}'.format(operator).zfill(12) + '\n'
-            obj_code += concat
+            obj_code +='{0:b}'.format(opcode).zfill(4) + '{0:b}'.format(operator).zfill(12) + '\n'
 
         # If not valid instruction, assembly error
         else: raise AssemblyError('Bad instruction: ' + command)
