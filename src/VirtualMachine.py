@@ -64,18 +64,21 @@ class VirtualMachine:
 
     # Defining execution algorithm 
     def fetch_instruction(self):
-        pass
+        self.instruction_register = self.memory[self.current_bank][self.program_counter].value << 8| \
+            self.memory[self.current_bank][self.instruction_counter + 1].value
+
+        self.program_counter += 2
 
     def execute_instruction(self):
         opcode = self.program_counter >> 12
 
         if opcode not in self.instruction_decoder['opcode']:
-            raise VirtualMachineError('Bad instruction at address 0x{:01X}{:03X}'.format(self.current_bank, self.program_counter))
+            raise VirtualMachineError('Bad instruction @ 0x{:01X}{:03X}'.format(self.current_bank, self.program_counter))
 
         self.instruction_decoder.set_index(opcode).at[opcode, 'instruction']()
 
     def run(self, step = True):
-        self.instruction_register = self.main_memory[0][0x022].value << 8 | self.main_memory[0][0x023].value
+        self.instruction_register = self.memory[0][0x022].value << 8 | self.memory[0][0x023].value
         self.running = True
         while self.running:
             self.fetch_instruction()
