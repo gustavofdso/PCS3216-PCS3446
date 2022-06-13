@@ -74,14 +74,14 @@ def _return_from_subroutine(self):
 def _halt_machine(self):
     operand = (self.instruction_register & 0x0F00) >> 8
 
-    if operand == 0:
+    if operand == 0b00:
         print('Machine halted! ^C to interrupt execution!')
         while True:
             try: pass
             except KeyboardInterrupt: self.running = False
 
-    elif operand == 1: self.indirect_mode = True
-    elif operand == 2: self.indirect_mode = False
+    elif operand == 0b01: self.indirect_mode = True
+    elif operand == 0b10: self.indirect_mode = False
 
 def _get_data(self):
     self.accumulator = c_int8(input('Enter data: '))

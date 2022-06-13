@@ -1,7 +1,4 @@
-# from src.VirtualMachine import VirtualMachine
+from src.VirtualMachine import VirtualMachine
 
-# virtualmachine = VirtualMachine()
-
-from src.assemble import assemble
-
-assemble('soma')
+virtualmachine = VirtualMachine()
+virtualmachine.assemble('soma')

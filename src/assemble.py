@@ -44,35 +44,51 @@ def assemble(self, filename):
 
         lines.loc[lines.shape[0]] = [label, command, operator]
 
-    labels = pd.DataFrame(columns = ['label', 'adress'])
-
     if not '@' in lines['command'].to_list(): raise AssemblyError('Program must have an start adress')
-
     start_adress = lines[lines['command'] == '@']['operator'].iloc[-1]
 
     # First assembly step - building label table
+    labels = pd.DataFrame(columns = ['label', 'adress'])
     instruction_counter = 0
     for i in lines.index:
         label, command, operator = lines.at[i, 'label'], lines.at[i, 'command'], lines.at[i, 'operator']
 
-        if label == '': continue
-
         # Getting label adress
         adress = start_adress + instruction_counter
-        if command == '$': instruction_counter += operator
-        else: instruction_counter += 2
+
+        # Pseudo-instructions
+        if command == '@':
+            pass
+
+        elif command == '$':
+            instruction_counter += operator
+
+        elif command == 'K':
+            instruction_counter += 1
+
+        elif command == '#':
+            break
+        
+        # Regular instruction
+        elif command in mnemonic_table['mnemonic'].to_list():
+            instruction_counter += 2
+
+        # If not valid instruction, assembly error
+        else: raise AssemblyError('Bad instruction: ' + command)
+
+        if label == '': continue
 
         labels.loc[labels.shape[0]] = [label, adress]
-
+    
     # Second assembly step - assembling instructions
-    obj_code = ''
+    obj_code = '{0:b}'.format(start_adress).zfill(8) + '\n'
     for i in lines.index:
         label, command, operator = lines.at[i, 'label'], lines.at[i, 'command'], lines.at[i, 'operator']
         if operator in labels['label'].to_list(): operator = labels.set_index('label').at[operator, 'adress']
         
         # Pseudo-instructions
         if command == '@':
-            obj_code += '{0:b}'.format(operator).zfill(8) + '\n'
+            pass
 
         # Reserving memory space with zero
         elif command == '$':
@@ -83,6 +99,7 @@ def assemble(self, filename):
         elif command == 'K':
             obj_code +='{0:b}'.format(operator).zfill(8) + '\n'
 
+        # Finish assembly
         elif command == '#':
             break
 
