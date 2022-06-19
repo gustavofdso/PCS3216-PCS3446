@@ -64,6 +64,7 @@ class VirtualMachine:
 
     # Defining execution algorithm 
     def fetch_instruction(self):
+        # TODO: debug
         self.instruction_register = self.memory[self.current_bank][self.program_counter].value << 8| \
             self.memory[self.current_bank][self.instruction_counter + 1].value
 
@@ -77,10 +78,67 @@ class VirtualMachine:
 
         self.instruction_decoder.set_index(opcode).at[opcode, 'instruction']()
 
-    def run(self, step = True):
+    def run_code(self, step = True):
         self.instruction_register = self.memory[0][0x022].value << 8 | self.memory[0][0x023].value
         self.running = True
         while self.running:
             self.fetch_instruction()
             self.execute_instruction()
             if step: input()
+
+    def run(self):
+        print('Please enter a command!')
+        while True:
+            msg = input('\n').split()
+            command = msg[0].upper()
+            if command == 'HELP':
+                print(
+"""
+Valid commands are:
+
+* HELP      - Briefs the commands.
+* ASM       - Assembles a source code file.
+    Type 'ASM source' with a source.asm file within the source directory.
+* LOAD      - Loads a file into memory.
+    Type 'LOAD object' with a object.fita file within the object directory.
+* DUMP      - Dumps a file from memory.
+    Type 'DUMP object' to dump a file within the object directory.
+* RUN       - Run code starting from memory position 0x0.
+    Type 'RUN' or 'RUN -STEP' to start running code.
+* EXIT      - Stops the command interpreter.
+"""
+                )
+            elif command == 'ASM':
+                if len(msg) == 1:
+                    print("Type 'ASM source' with a source.asm file within the source directory.")
+                else:
+                    source = msg[1]
+                    self.assemble(source)
+            elif command == 'LOAD':
+                if len(msg) == 1:
+                    print("Type 'LOAD object' with a object.fita file within the object directory..")
+                else:
+                    source = msg[1]
+                    self.load(source)
+            elif command == 'DUMP':
+                # TODO: fazer essa funcao
+                pass
+            elif command == 'RUN':
+                if msg[-1].upper() == 'STEP': self.run_code(step = True)
+                else: self.run_code(step = False)
+            elif command == 'EXIT':
+                break
+            else:
+                print(
+"""
+Invalid command!
+Valid commands are:
+
+* HELP
+* ASM
+* LOAD
+* DUMP
+* RUN
+* EXIT
+"""
+                )

@@ -10,4 +10,4 @@ def dump(self, start_position, end_position, filename):
 
 def hex_dump(self, start_position, end_position):
     for i in range(start_position, end_position):
-        print(self.memory[self.current_bank][i])
+        print(i, ' - ', self.memory[self.current_bank][i])

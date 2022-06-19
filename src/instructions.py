@@ -69,6 +69,7 @@ def _subroutine_call(self):
     self.program_counter = operand + 2
     
 def _return_from_subroutine(self):
+    # TODO: fazer essa func
     pass
     
 def _halt_machine(self):
