@@ -94,6 +94,7 @@ class VirtualMachine:
             if command == 'HELP':
                 print(
 """
+Help!
 Valid commands are:
 
 * HELP      - Briefs the commands.
@@ -104,7 +105,7 @@ Valid commands are:
 * DUMP      - Dumps a file from memory.
     Type 'DUMP object' to dump a file within the object directory.
 * RUN       - Run code starting from memory position 0x0.
-    Type 'RUN' or 'RUN -STEP' to start running code.
+    Type 'RUN' or 'RUN STEP' to start running code.
 * EXIT      - Stops the command interpreter.
 """
                 )
@@ -113,20 +114,29 @@ Valid commands are:
                     print("Type 'ASM source' with a source.asm file within the source directory.")
                 else:
                     source = msg[1]
+                    print('Assembling ' + source + '...')
                     self.assemble(source)
+                    print('Done assembling ' + source + '!')
             elif command == 'LOAD':
                 if len(msg) == 1:
-                    print("Type 'LOAD object' with a object.fita file within the object directory..")
+                    print("Type 'LOAD object' with a object.fita file within the object directory.")
                 else:
                     source = msg[1]
+                    print('Loading ' + source + '...')
                     self.load(source)
+                    print('Done loading ' + source + '!')
             elif command == 'DUMP':
                 # TODO: fazer essa funcao
                 pass
             elif command == 'RUN':
-                if msg[-1].upper() == 'STEP': self.run_code(step = True)
-                else: self.run_code(step = False)
+                if len(msg) == 1:
+                    self.run_code(step = False)
+                else:
+                    step = msg[1].upper()
+                    if step == 'STEP': self.run_code(step = True)
+                    else: print("Type 'RUN' or 'RUN STEP' to start running code.")
             elif command == 'EXIT':
+                print('Exiting command interpreter!')
                 break
             else:
                 print(
