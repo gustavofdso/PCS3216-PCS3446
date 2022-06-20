@@ -65,21 +65,19 @@ class VirtualMachine:
     # Defining execution algorithm 
     def fetch_instruction(self):
         # TODO: debug
-        self.instruction_register = self.memory[self.current_bank][self.program_counter].value << 8| \
-            self.memory[self.current_bank][self.instruction_counter + 1].value
-
-        self.program_counter += 2
+        self.instruction_register = self.memory[self.current_bank.value][self.program_counter.value].value << 8 | self.memory[self.current_bank.value][self.program_counter.value + 1].value
+        self.program_counter.value += 2
 
     def execute_instruction(self):
-        opcode = self.program_counter >> 12
+        # TODO: talvez isso de bug
+        opcode = (self.program_counter >> 12).value
 
         if opcode not in self.instruction_decoder['opcode']:
             raise VirtualMachineError('Bad instruction @ 0x{:01X}{:03X}'.format(self.current_bank, self.program_counter))
-
         self.instruction_decoder.set_index(opcode).at[opcode, 'instruction']()
 
     def run_code(self, step = True):
-        self.instruction_register = self.memory[0][0x022].value << 8 | self.memory[0][0x023].value
+        self.program_counter = c_uint16(0x20)
         self.running = True
         while self.running:
             self.fetch_instruction()
@@ -101,7 +99,7 @@ Valid commands are:
 * ASM       - Assembles a source code file.
     Type 'ASM source' with a source.asm file within the source directory.
 * LOAD      - Loads a file into memory.
-    Type 'LOAD object' with a object.fita file within the object directory.
+    Type 'LOAD object' with a object.obj file within the object directory.
 * DUMP      - Dumps a file from memory.
     Type 'DUMP object' to dump a file within the object directory.
 * RUN       - Run code starting from memory position 0x0.
@@ -110,7 +108,7 @@ Valid commands are:
 """
                 )
             elif command == 'ASM':
-                if len(msg) == 1:
+                if len(msg) != 2:
                     print("Type 'ASM source' with a source.asm file within the source directory.")
                 else:
                     source = msg[1]
@@ -118,8 +116,8 @@ Valid commands are:
                     self.assemble(source)
                     print('Done assembling ' + source + '!')
             elif command == 'LOAD':
-                if len(msg) == 1:
-                    print("Type 'LOAD object' with a object.fita file within the object directory.")
+                if len(msg) != 2:
+                    print("Type 'LOAD object' with a object.obj file within the object directory.")
                 else:
                     source = msg[1]
                     print('Loading ' + source + '...')

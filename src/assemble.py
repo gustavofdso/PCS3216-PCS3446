@@ -112,6 +112,6 @@ def assemble(self, filename):
         else: raise AssemblyError('Bad instruction: ' + command)
 
     # Saving binary to object file
-    with open('./object/' + filename + '.fita', 'w') as f:
+    with open('./object/' + filename + '.obj', 'w') as f:
         f.write(obj_code)
         f.close()
