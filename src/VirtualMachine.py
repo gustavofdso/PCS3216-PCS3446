@@ -89,64 +89,44 @@ class VirtualMachine:
         while True:
             msg = input('\n').split()
             command = msg[0].upper()
-            if command == 'HELP':
-                print(
+            try:
+                if command == 'HELP':
+                    print(
 """
 Help!
 Valid commands are:
 
 * HELP      - Briefs the commands.
-* ASM       - Assembles a source code file.
-    Type 'ASM source' with a source.asm file within the source directory.
-* LOAD      - Loads a file into memory.
-    Type 'LOAD object' with a object.obj file within the object directory.
-* DUMP      - Dumps a file from memory.
-    Type 'DUMP object' to dump a file within the object directory.
-* RUN       - Run code starting from memory position 0x0.
-    Type 'RUN' or 'RUN STEP' to start running code.
-* EXIT      - Stops the command interpreter.
+* ASM       - Assembles a source code file
+    Type 'ASM source' with a source.asm file within the source directory
+* LOAD      - Loads a file into memory
+    Type 'LOAD <object>' with a object.obj file within the object directory
+* DUMP      - Dumps a file from memory
+    Type 'DUMP <position> <size> <object>' to dump a file within the object directory
+* RUN       - Run code starting from memory position 0x0
+    Type 'RUN' or 'RUN STEP' to start running code
+* EXIT      - Stops the command interpreter
 """
                 )
-            elif command == 'ASM':
-                if len(msg) != 2:
-                    print("Type 'ASM source' with a source.asm file within the source directory.")
-                else:
+                elif command == 'ASM':
                     source = msg[1]
-                    print('Assembling ' + source + '...')
                     self.assemble(source)
-                    print('Done assembling ' + source + '!')
-            elif command == 'LOAD':
-                if len(msg) != 2:
-                    print("Type 'LOAD object' with a object.obj file within the object directory.")
-                else:
+                elif command == 'LOAD':
                     source = msg[1]
-                    print('Loading ' + source + '...')
                     self.load(source)
-                    print('Done loading ' + source + '!')
-            elif command == 'DUMP':
-                # TODO: fazer essa funcao
-                pass
-            elif command == 'RUN':
-                if len(msg) == 1:
-                    self.run_code(step = False)
+                elif command == 'DUMP':
+                    position, size, source = int(msg[1]), int(msg[2]), msg[3]
+                    self.dump(position, size, source)
+                elif command == 'RUN':
+                    if len(msg) == 1:
+                        self.run_code(step = False)
+                    else:
+                        step = msg[1].upper()
+                        if step == 'STEP': self.run_code(step = True)
+                        else: print("Type 'RUN' or 'RUN STEP' to start running code")
+                elif command == 'EXIT':
+                    print('Exiting command interpreter!')
+                    break
                 else:
-                    step = msg[1].upper()
-                    if step == 'STEP': self.run_code(step = True)
-                    else: print("Type 'RUN' or 'RUN STEP' to start running code.")
-            elif command == 'EXIT':
-                print('Exiting command interpreter!')
-                break
-            else:
-                print(
-"""
-Invalid command!
-Valid commands are:
-
-* HELP
-* ASM
-* LOAD
-* DUMP
-* RUN
-* EXIT
-"""
-                )
+                    print("Invalid command! Type 'HELP'!")
+            except Exception as e: print("Error!\n" + e.with_traceback + "\n Type 'HELP'!")
