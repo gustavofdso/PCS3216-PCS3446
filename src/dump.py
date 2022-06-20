@@ -10,4 +10,8 @@ def dump(self, start_position, size, filename):
 
 def hex_dump(self, start_position, size):
     for i in range(size):
-        print('{0:X}'.format(i).zfill(2), '->', '{0:X}'.format(self.memory[self.current_bank.value][start_position + i].value).zfill(2))
+        print(
+            '{0:X}'.format(start_position + i).zfill(2),
+            '->',
+            '{0:X}'.format(self.memory[self.current_bank.value][start_position + i].value).zfill(2)
+        )

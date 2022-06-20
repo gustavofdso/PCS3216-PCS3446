@@ -107,7 +107,7 @@ Valid commands are:
     Type 'RUN' or 'RUN STEP' to start running code
 * EXIT      - Stops the command interpreter
 """
-                )
+                    )
                 elif command == 'ASM':
                     source = msg[1]
                     self.assemble(source)
