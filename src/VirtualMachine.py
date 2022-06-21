@@ -1,4 +1,5 @@
 import pandas as pd
+import pyparsing as pp
 from ctypes import c_uint8, c_uint16, c_int8
 
 class VirtualMachineError(Exception): pass
@@ -85,11 +86,12 @@ class VirtualMachine:
             if step: input()
 
     def run(self):
-        print('Please enter a command!')
+        print('Enter a command!')
         while True:
-            msg = input('\n').split()
+            msg = input('$').split()
             command = msg[0].upper()
             try:
+                # TODO: fazer pyparsing com flags
                 if command == 'HELP':
                     print(
 """
@@ -98,7 +100,7 @@ Valid commands are:
 
 * HELP      - Briefs the commands.
 * ASM       - Assembles a source code file
-    Type 'ASM source' with a source.asm file within the source directory
+    Type 'ASM <source>' with a source.asm file within the source directory
 * LOAD      - Loads a file into memory
     Type 'LOAD <object>' with a object.obj file within the object directory
 * DUMP      - Dumps a file from memory
@@ -115,7 +117,7 @@ Valid commands are:
                     source = msg[1]
                     self.load(source)
                 elif command == 'DUMP':
-                    position, size, source = int(msg[1]), int(msg[2]), msg[3]
+                    source, position, size = msg[1:4]
                     self.dump(position, size, source)
                 elif command == 'RUN':
                     if len(msg) == 1:
@@ -129,4 +131,4 @@ Valid commands are:
                     break
                 else:
                     print("Invalid command! Type 'HELP'!")
-            except Exception as e: print("Error!\n" + e.with_traceback + "\n Type 'HELP'!")
+            except Exception as e: print(e.__class__.__name__ + ': ' + str(e), "\n\nType 'HELP'!")

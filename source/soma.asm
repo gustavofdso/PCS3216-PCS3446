@@ -7,3 +7,4 @@ INICIO      LD      VALOR1      ; passando as variáveis
             MM      GUARDAR
             HM      /00
 GUARDAR     $       =1          ; endereco a ser guardado
+            #

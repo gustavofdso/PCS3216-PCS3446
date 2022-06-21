@@ -76,7 +76,7 @@ def _halt_machine(self):
     operand = (self.instruction_register.value & 0x0F00) >> 8
 
     if operand == 0b00:
-        print('Machine halted! ^C to interrupt execution!')
+        print('Machine halted! Press ^C to interrupt execution!')
         while True:
             try: pass
             except KeyboardInterrupt: self.running = False
@@ -93,11 +93,11 @@ def _put_data(self):
 def _operating_system(self):
     operand = (self.instruction_register.value & 0x0F00) >> 8
 
-    # Dump current state to stdout
+    # Print current state
     if operand == 0b0000:
-        print('-- Current VM State')
+        print('-- Current VM State --')
         print('ACC => {0: 04d}'.format(self.accumulator.value))
-        print('PC  => {0: #05x}'.format(self.program_counter.value.value))
+        print('PC  => {0: #05x}'.format(self.program_counter.value))
         print('RI  => {0: #05x}'.format(self.instruction_register.value))
 
     # Finish execution

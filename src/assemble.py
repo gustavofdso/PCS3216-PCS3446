@@ -45,6 +45,7 @@ def assemble(self, filename):
         lines.loc[lines.shape[0]] = [label, command, operator]
 
     if not '@' in lines['command'].to_list(): raise AssemblyError('Program must have an start adress')
+    if not '#' in lines['command'].to_list(): raise AssemblyError('Program must have an end adress')
     start_adress = lines[lines['command'] == '@']['operator'].iloc[-1]
 
     # First assembly step - building label table
@@ -101,6 +102,7 @@ def assemble(self, filename):
 
         # Finish assembly
         elif command == '#':
+            obj_code += '1111111100000000'
             break
 
         # Regular instruction
