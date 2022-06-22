@@ -127,14 +127,17 @@ class VirtualMachine:
     usage: EXIT
 """
                     )
+                    
                 elif command == 'ASM':
                     kwargs, args = parser.parse_known_args(msg)
                     kwargs = vars(kwargs)
                     self.assemble(args[1])
+
                 elif command == 'LOAD':
                     kwargs, args = parser.parse_known_args(msg)
                     kwargs = vars(kwargs)
                     self.load(args[1])
+
                 elif command == 'DUMP':
                     parser.add_argument('-a', default = '0', type = str)
                     parser.add_argument('-b', default = '0', type = str)
@@ -144,6 +147,7 @@ class VirtualMachine:
                     kwargs = vars(kwargs)
                     if kwargs['hex']: self.hex_dump(kwargs['a'], kwargs['b'], kwargs['s'])
                     else: self.dump(kwargs['a'], kwargs['s'], kwargs['b'], args[1])
+
                 elif command == 'RUN':
                     parser.add_argument('-a', default = '0', type = str)
                     parser.add_argument('-b', default = '0', type = str)
@@ -151,9 +155,11 @@ class VirtualMachine:
                     kwargs, args = parser.parse_known_args(msg)
                     kwargs = vars(kwargs)
                     self.run_code(kwargs['a'], kwargs['b'], step = kwargs['step'])
+
                 elif command == 'EXIT':
                     print('Exiting command interpreter!')
                     break
+
                 else:
                     print("Invalid command! Type HELP!")
             
