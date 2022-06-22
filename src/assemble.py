@@ -50,7 +50,7 @@ def assemble(self, filename):
 
     # First assembly step - building label table
     labels = pd.DataFrame(columns = ['label', 'adress'])
-    instruction_counter = 0
+    instruction_counter = start_adress
     for i in lines.index:
         label, command, operator = lines.at[i, 'label'], lines.at[i, 'command'], lines.at[i, 'operator']
 
@@ -85,6 +85,7 @@ def assemble(self, filename):
     obj_code = '{0:b}'.format(start_adress).zfill(8) + '\n'
     for i in lines.index:
         label, command, operator = lines.at[i, 'label'], lines.at[i, 'command'], lines.at[i, 'operator']
+        if operator == '': operator = 0
         if operator in labels['label'].to_list(): operator = labels.set_index('label').at[operator, 'adress']
         
         # Pseudo-instructions

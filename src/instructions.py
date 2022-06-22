@@ -2,65 +2,60 @@ from ctypes import c_int8
 
 # Inconditional jump to addresss
 def _jump(self):
-    operand = self.instruction_register.value & 0xFFF
+    operand = self.instruction_register.value & 0x0FFF
     self.program_counter.value = operand
 
 # Jump to addresss if accumulator is zero
 def _jump_if_zero(self):
-    if self.accumulator == 0: self._jump()
+    if self.accumulator.value == 0: self._jump()
 
 # Jump to addresss if accumulator is negative
 def _jump_if_negative(self):
-    if self.accumulator < 0: self._jump()
+    if self.accumulator.value < 0: self._jump()
     
 # Load value to accumulator
 def _load_value(self):
-    operand = self.instruction_register.value & 0xFF
-    self.accumulator = operand
+    operand = self.instruction_register.value & 0x00FF
+    self.accumulator.value = operand
     
 # Add value from memory to accumulator
 def _add(self):
-    operand = self.instruction_register.value & 0xFFF
-    self.accumulator += self.get_from_memory(operand)
+    operand = self.instruction_register.value & 0x0FFF
+    adress = self.get_indirect_adress(operand)
+    self.accumulator.value += self.memory[self.current_bank.value][adress].value
 
 # Subtract value from memory from accumulator
 def _subtract(self):
-    operand = self.instruction_register.value & 0xFFF
-    self.accumulator -= self.get_from_memory(operand)
+    operand = self.instruction_register.value & 0x0FFF
+    adress = self.get_indirect_adress(operand)
+    self.accumulator.value -= self.memory[self.current_bank.value][adress].value
 
 # Multiply value from memory by accumulator
 def _multiply(self):
-    operand = self.instruction_register.value & 0xFFF
-    self.accumulator *= self.get_from_memory(operand)
+    operand = self.instruction_register.value & 0x0FFF
+    adress = self.get_indirect_adress(operand)
+    self.accumulator.value *= self.memory[self.current_bank.value][adress].value
     
 # Divide accumulator by value from memory
 def _divide(self):
-    operand = self.instruction_register.value & 0xFFF
-    self.accumulator //= self.get_from_memory(operand)
+    operand = self.instruction_register.value & 0x0FFF
+    adress = self.get_indirect_adress(operand)
+    self.accumulator.value //= self.memory[self.current_bank.value][adress].value
 
 # Load accumulator with value from memory
 def _load(self):
-    operand = self.instruction_register.value & 0xFFF
-    self.accumulator = self.get_from_memory(operand)
+    operand = self.instruction_register.value & 0x0FFF
+    adress = self.get_indirect_adress(operand)
+    self.accumulator = self.memory[self.current_bank.value][adress]
 
 # Move accumulator to memory
 def _move_to_memory(self):
-    operand = self.instruction_register.value & 0xFFF
-
-    if self.indirect_mode:
-        addr = self.memory[self.current_bank.value][operand].value << 8 | self.memory[self.current_bank.value][operand + 1].value
-        bank = addr >> 12
-        addr &= 0xFFF
-    else:
-        bank = self.current_bank.value
-        addr = operand
-
-    self.indirect_mode = False
-
-    self.memory[bank][addr].value = self.accumulator
+    operand = self.instruction_register.value & 0x0FFF
+    adress = self.get_indirect_adress(operand)
+    self.memory[self.current_bank.value][adress] = self.accumulator
 
 def _subroutine_call(self):
-    operand = self.instruction_register.value & 0xFFF
+    operand = self.instruction_register.value & 0x0FFF
     next_instr = self.program_counter.value
 
     self.memory[self.current_bank.value][operand].value = next_instr >> 8
@@ -75,30 +70,30 @@ def _return_from_subroutine(self):
 def _halt_machine(self):
     operand = (self.instruction_register.value & 0x0F00) >> 8
 
-    if operand == 0b00:
+    if operand == 0b0000:
         print('Machine halted! Press ^C to interrupt execution!')
         while True:
             try: pass
             except KeyboardInterrupt: self.running = False
 
-    elif operand == 0b01: self.indirect_mode = True
-    elif operand == 0b10: self.indirect_mode = False
+    elif operand == 0b0001: self.indirect_mode = True
+    elif operand == 0b0010: self.indirect_mode = False
 
 def _get_data(self):
-    self.accumulator = c_int8(input('Enter data: '))
+    self.accumulator = c_int8(input('Enter ACC => '))
 
 def _put_data(self):
-    print('ACC => {1:04d}'.format(self.accumulator.value))
+    print('ACC => {:04d}'.format(self.accumulator.value))
     
 def _operating_system(self):
     operand = (self.instruction_register.value & 0x0F00) >> 8
 
     # Print current state
     if operand == 0b0000:
-        print('-- Current VM State --')
-        print('ACC => {0: 04d}'.format(self.accumulator.value))
-        print('PC  => {0: #05x}'.format(self.program_counter.value))
-        print('RI  => {0: #05x}'.format(self.instruction_register.value))
+        print('Internal registers:')
+        print('ACC => {:d}'.format(self.accumulator.value))
+        print('PC  => {:#05X}'.format(self.program_counter.value))
+        print('RI  => {:#05X}'.format(self.instruction_register.value))
 
     # Finish execution
     elif operand == 0b1111:
