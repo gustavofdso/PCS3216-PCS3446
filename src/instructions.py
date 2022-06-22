@@ -46,28 +46,22 @@ def _divide(self):
 def _load(self):
     operand = self.instruction_register.value & 0x0FFF
     adress = self.get_indirect_adress(operand)
-    self.accumulator = self.memory[self.current_bank.value][adress]
+    self.accumulator.value = self.memory[self.current_bank.value][adress].value
 
 # Move accumulator to memory
 def _move_to_memory(self):
     operand = self.instruction_register.value & 0x0FFF
     adress = self.get_indirect_adress(operand)
-    self.memory[self.current_bank.value][adress] = self.accumulator
+    self.memory[self.current_bank.value][adress].value = self.accumulator.value
 
 # Enter a subroutine
 def _subroutine_call(self):
-    operand = self.instruction_register.value & 0x0FFF
-    next_instr = self.program_counter.value
-
-    self.memory[self.current_bank.value][operand].value = next_instr >> 8
-    self.memory[self.current_bank.value][operand + 1].value = next_instr & 0x00FF
-
-    self.program_counter.value = operand + 2
+    self.link_register.value = self.program_counter.value
+    self._jump()
 
 # Return from a subroutine
 def _return_from_subroutine(self):
-    # TODO: fazer essa func
-    pass
+    self.program_counter.value = self.link_register.value
     
 # Halt the machine or turn on/off the memory indirect mode
 def _halt_machine(self):
@@ -97,7 +91,7 @@ def _operating_system(self):
     # Print current state
     if operand == 0b0000:
         print(
-            'Internal registers:\n'
+            'OS Call! Machine status:\n'
             '\tACC => {:d}\n'.format(self.accumulator.value),
             '\tPC  => {:#05X}\n'.format(self.program_counter.value),
             '\tRI  => {:#05X}\n'.format(self.instruction_register.value)

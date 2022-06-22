@@ -43,7 +43,9 @@ def assemble(self, filename):
 
     if not '@' in lines['command'].to_list(): raise AssemblyError('Program must have an start adress')
     if not '#' in lines['command'].to_list(): raise AssemblyError('Program must have an end adress')
-    start_adress = lines[lines['command'] == '@']['operator'].iloc[-1]
+    adress_line = lines[lines['command'] == '@']['operator'].iloc[-1]
+    bank = (adress_line & 0xF000) >> 12
+    start_adress = adress_line & 0x0FFF
 
     # First assembly step - building label table
     labels = pd.DataFrame(columns = ['label', 'adress'])
@@ -52,7 +54,7 @@ def assemble(self, filename):
         label, command, operator = lines.at[i, 'label'], lines.at[i, 'command'], lines.at[i, 'operator']
 
         # Getting label adress
-        adress = start_adress + instruction_counter
+        label_adress = start_adress + instruction_counter
 
         # Pseudo-instructions
 
@@ -81,10 +83,10 @@ def assemble(self, filename):
 
         if label == '': continue
 
-        labels.loc[labels.shape[0]] = [label, adress]
+        labels.loc[labels.shape[0]] = [label, label_adress]
     
     # Second assembly step - assembling instructions
-    obj_code = '{:b}'.format(start_adress).zfill(16) + '\n'
+    obj_code = '{:b}'.format(bank).zfill(4) + '{:b}'.format(start_adress).zfill(12) + '\n'
     for i in lines.index:
         label, command, operator = lines.at[i, 'label'], lines.at[i, 'command'], lines.at[i, 'operator']
         if operator in labels['label'].to_list(): operator = labels.set_index('label').at[operator, 'adress']

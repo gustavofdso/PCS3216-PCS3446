@@ -10,6 +10,7 @@ class VirtualMachine:
         
         # Initializing system registers
         self.program_counter = c_uint16(0)
+        self.link_register = c_uint16(0)
         self.instruction_register = c_uint16(0)
         self.accumulator = c_int8(0)
 
@@ -72,9 +73,11 @@ class VirtualMachine:
         elif opcode == 0xE: self._put_data()
         elif opcode == 0xF: self._operating_system()
 
-    def run_code(self, start_position, step = True):
-        start_position = self.string_to_number(start_position)
-        self.program_counter = c_uint16(start_position)
+    def run_code(self, start_position, bank, step = True):
+        self.program_counter.value = self.string_to_number(start_position)
+        self.current_bank.value = self.string_to_number(bank)
+
+        # Running sequential instructions
         self.running = True
         while self.running:
             self.fetch_instruction()
@@ -82,7 +85,7 @@ class VirtualMachine:
             if step:
                 input()
                 print(
-                    'Internal registers:\n'
+                    'Machine status:\n'
                     '\tACC => {:d}\n'.format(self.accumulator.value),
                     '\tPC  => {:#05X}\n'.format(self.program_counter.value),
                     '\tRI  => {:#05X}'.format(self.instruction_register.value)
@@ -106,17 +109,19 @@ class VirtualMachine:
 * LOAD          - Loads a file into memory.
     usage: LOAD FILENAME
 * DUMP          - Dumps a file from memory.
-    usage: DUMP FILENAME [-p POSITION] [-s SIZE] [--hex]
+    usage: DUMP FILENAME [-a ADRESS] [-b BANK] [-s SIZE] [--hex]
 
     options:
-        -p      Selects the start position for the code. Default 0x0
+        -a      Selects the start adress for the code. Default 0x0
+        -b      Selects the memory bank for the code. Default 0
         -s      Selects the size for the code in bytes. Default 16
         --hex   Selects if the dump should be to file or hexadecimal to screen. Default False
 * RUN       - Run code.
-    usage: RUN [-p POSITION] [--step]
+    usage: RUN [-a ADRESS] [-b BANK]  [--step]
 
     options:
-        -p      Selects the start position for the code. Default 0x0
+        -a      Selects the start adress for the code. Default 0x0
+        -b      Selects the memory bank for the code. Default 0
         --step  Selects if the code should be run step by step. Default False
 * EXIT      - Stops the command interpreter.
     usage: EXIT
@@ -131,19 +136,21 @@ class VirtualMachine:
                     kwargs = vars(kwargs)
                     self.load(args[1])
                 elif command == 'DUMP':
-                    parser.add_argument('-p', default = '0', type = str)
+                    parser.add_argument('-a', default = '0', type = str)
+                    parser.add_argument('-b', default = '0', type = str)
                     parser.add_argument('-s', default = '16', type = str)
                     parser.add_argument('--hex', action = "store_true")
                     kwargs, args = parser.parse_known_args(msg)
                     kwargs = vars(kwargs)
-                    if kwargs['hex']:self.hex_dump(kwargs['p'], kwargs['s'])
-                    else: self.dump(kwargs['p'], kwargs['s'], args[1])
+                    if kwargs['hex']:self.hex_dump(kwargs['a'], kwargs['b'], kwargs['s'])
+                    else: self.dump(kwargs['a'], kwargs['s'], kwargs['b'], args[1])
                 elif command == 'RUN':
-                    parser.add_argument('-p', default = '0', type = str)
+                    parser.add_argument('-a', default = '0', type = str)
+                    parser.add_argument('-b', default = '0', type = str)
                     parser.add_argument('--step', action = "store_true")
                     kwargs, args = parser.parse_known_args(msg)
                     kwargs = vars(kwargs)
-                    self.run_code(kwargs['p'], step = kwargs['step'])
+                    self.run_code(kwargs['a'], kwargs['b'], step = kwargs['step'])
                 elif command == 'EXIT':
                     print('Exiting command interpreter!')
                     break
