@@ -3,7 +3,7 @@ def dump(self, start_adress, bank, size, filename):
     bank = self.string_to_number(bank)
     size = self.string_to_number(size)
 
-    obj_code = '{:b}'.format(bank).zfill(4) + '{:b}'.format(start_adress).zfill(12)
+    obj_code = '{:b}'.format(bank).zfill(4) + '{:b}'.format(start_adress).zfill(12) + '\n'
     for i in range(size):
         obj_code += '{:b}'.format(self.memory[bank][start_adress + i].value).zfill(8) + '\n'
 

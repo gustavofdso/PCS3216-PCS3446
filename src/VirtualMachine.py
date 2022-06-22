@@ -127,7 +127,7 @@ class VirtualMachine:
     usage: EXIT
 """
                     )
-                    
+
                 elif command == 'ASM':
                     kwargs, args = parser.parse_known_args(msg)
                     kwargs = vars(kwargs)
@@ -145,8 +145,10 @@ class VirtualMachine:
                     parser.add_argument('--hex', action = "store_true")
                     kwargs, args = parser.parse_known_args(msg)
                     kwargs = vars(kwargs)
-                    if kwargs['hex']: self.hex_dump(kwargs['a'], kwargs['b'], kwargs['s'])
-                    else: self.dump(kwargs['a'], kwargs['s'], kwargs['b'], args[1])
+                    if kwargs['hex']:
+                        self.hex_dump(kwargs['a'], kwargs['b'], kwargs['s'])
+                    else:
+                        self.dump(kwargs['a'], kwargs['b'], kwargs['s'], args[1])
 
                 elif command == 'RUN':
                     parser.add_argument('-a', default = '0', type = str)
