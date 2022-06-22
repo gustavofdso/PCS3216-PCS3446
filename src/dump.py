@@ -1,4 +1,4 @@
-def dump(self, start_adress, bank, size, filename):
+def dump(self, filename, size, start_adress, bank):
     start_adress = self.string_to_number(start_adress)
     bank = self.string_to_number(bank)
     size = self.string_to_number(size)
@@ -12,7 +12,7 @@ def dump(self, start_adress, bank, size, filename):
         f.write(obj_code)
         f.close()
 
-def hex_dump(self, start_adress, bank, size):
+def hex_dump(self, size, start_adress, bank):
     start_adress = self.string_to_number(start_adress)
     bank = self.string_to_number(bank)
     size = self.string_to_number(size)
