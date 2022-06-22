@@ -41,6 +41,7 @@ def assemble(self, filename):
 
         lines.loc[lines.shape[0]] = [label, command, operator]
 
+    # Getting bank and memory adress for the code
     if not '@' in lines['command'].to_list(): raise AssemblyError('Program must have an start adress')
     if not '#' in lines['command'].to_list(): raise AssemblyError('Program must have an end adress')
     adress_line = lines[lines['command'] == '@']['operator'].iloc[-1]

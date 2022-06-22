@@ -73,8 +73,8 @@ class VirtualMachine:
         elif opcode == 0xE: self._put_data()
         elif opcode == 0xF: self._operating_system()
 
-    def run_code(self, start_position, bank, step = True):
-        self.program_counter.value = self.string_to_number(start_position)
+    def run_code(self, start_adress, bank, step = True):
+        self.program_counter.value = self.string_to_number(start_adress)
         self.current_bank.value = self.string_to_number(bank)
 
         # Running sequential instructions
@@ -112,17 +112,17 @@ class VirtualMachine:
     usage: DUMP FILENAME [-a ADRESS] [-b BANK] [-s SIZE] [--hex]
 
     options:
-        -a      Selects the start adress for the code. Default 0x0
-        -b      Selects the memory bank for the code. Default 0
-        -s      Selects the size for the code in bytes. Default 16
-        --hex   Selects if the dump should be to file or hexadecimal to screen. Default False
+        -a      Selects the start adress for the code. Default 0x0.
+        -b      Selects the memory bank for the code. Default 0.
+        -s      Selects the size for the code in bytes. Default 16.
+        --hex   Selects if the dump should be binary to file or hexadecimal to screen. Default False.
 * RUN       - Run code.
     usage: RUN [-a ADRESS] [-b BANK]  [--step]
 
     options:
-        -a      Selects the start adress for the code. Default 0x0
-        -b      Selects the memory bank for the code. Default 0
-        --step  Selects if the code should be run step by step. Default False
+        -a      Selects the start adress for the code. Default 0x0.
+        -b      Selects the memory bank for the code. Default 0.
+        --step  Selects if the code should be run step by step. Default False.
 * EXIT      - Stops the command interpreter.
     usage: EXIT
 """
@@ -142,7 +142,7 @@ class VirtualMachine:
                     parser.add_argument('--hex', action = "store_true")
                     kwargs, args = parser.parse_known_args(msg)
                     kwargs = vars(kwargs)
-                    if kwargs['hex']:self.hex_dump(kwargs['a'], kwargs['b'], kwargs['s'])
+                    if kwargs['hex']: self.hex_dump(kwargs['a'], kwargs['b'], kwargs['s'])
                     else: self.dump(kwargs['a'], kwargs['s'], kwargs['b'], args[1])
                 elif command == 'RUN':
                     parser.add_argument('-a', default = '0', type = str)
