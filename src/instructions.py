@@ -60,7 +60,7 @@ def _subroutine_call(self):
     next_instr = self.program_counter.value
 
     self.memory[self.current_bank.value][operand].value = next_instr >> 8
-    self.memory[self.current_bank.value][operand + 1].value = next_instr & 0xFF
+    self.memory[self.current_bank.value][operand + 1].value = next_instr & 0x00FF
 
     self.program_counter.value = operand + 2
 
@@ -96,10 +96,12 @@ def _operating_system(self):
 
     # Print current state
     if operand == 0b0000:
-        print('Internal registers:')
-        print('ACC => {:d}'.format(self.accumulator.value))
-        print('PC  => {:#05X}'.format(self.program_counter.value))
-        print('RI  => {:#05X}'.format(self.instruction_register.value))
+        print(
+            'Internal registers:\n'
+            '\tACC => {:d}\n'.format(self.accumulator.value),
+            '\tPC  => {:#05X}\n'.format(self.program_counter.value),
+            '\tRI  => {:#05X}\n'.format(self.instruction_register.value)
+        )
 
     # Finish execution
     elif operand == 0b1111:

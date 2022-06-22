@@ -1,8 +1,6 @@
 import argparse
 from ctypes import c_uint8, c_uint16, c_int8
 
-class VirtualMachineError(Exception): pass
-
 class VirtualMachine:
     def __init__(self, banks = 16, bank_size = 4096):
         # Initializing system memory
@@ -29,12 +27,14 @@ class VirtualMachine:
 
         return adress
 
-    def base_to_number(self, number):
+    # Defining string to number conversion
+    def string_to_number(self, number):
         if number[0] == '=': number = int(number[1:], 10)
         elif number[0] == '#': number = int(number[1:], 2)
         elif number[0] == '/': number = int(number[1:], 16)
-        try: number = int(number, 10)
-        except Exception: pass
+        else:
+            try: number = int(number, 10)
+            except Exception: pass
 
         return number
 
@@ -73,18 +73,26 @@ class VirtualMachine:
         elif opcode == 0xF: self._operating_system()
 
     def run_code(self, start_position, step = True):
-        start_position = self.base_to_number(start_position)
+        start_position = self.string_to_number(start_position)
         self.program_counter = c_uint16(start_position)
         self.running = True
         while self.running:
             self.fetch_instruction()
             self.execute_instruction()
-            if step: input()
+            if step:
+                input()
+                print(
+                    'Internal registers:\n'
+                    '\tACC => {:d}\n'.format(self.accumulator.value),
+                    '\tPC  => {:#05X}\n'.format(self.program_counter.value),
+                    '\tRI  => {:#05X}'.format(self.instruction_register.value)
+                )
 
     def run(self):
         print('Enter a command!')
         while True:
             msg = input('$ ').split()
+            if len(msg) == 0: continue
             command = msg[0].upper()
             parser = argparse.ArgumentParser()
             try:
@@ -98,7 +106,7 @@ class VirtualMachine:
 * LOAD          - Loads a file into memory.
     usage: LOAD FILENAME
 * DUMP          - Dumps a file from memory.
-    usage: DUMP FILENAME [-p POSITION] [-s SIZE]
+    usage: DUMP FILENAME [-p POSITION] [-s SIZE] [--hex]
 
     options:
         -p      Selects the start position for the code. Default 0x0
@@ -141,4 +149,6 @@ class VirtualMachine:
                     break
                 else:
                     print("Invalid command! Type HELP!")
-            except Exception as e: print(e.__class__.__name__ + ': ' + str(e), "\n\nType 'HELP'!")
+            
+            except IndexError: print("Incorrect usage for this command! Type 'HELP'!")
+            except Exception as e: print(e.__class__.__name__ + ': ' + str(e) + "\n\nType 'HELP'!")

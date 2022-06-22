@@ -37,7 +37,7 @@ def assemble(self, filename):
                 operator = content[2]
         except Exception: pass
 
-        if operator != '': operator = self.base_to_number(operator)
+        if operator != '': operator = self.string_to_number(operator)
 
         lines.loc[lines.shape[0]] = [label, command, operator]
 
@@ -55,15 +55,20 @@ def assemble(self, filename):
         adress = start_adress + instruction_counter
 
         # Pseudo-instructions
+
+        # Program start adress
         if command == '@':
             pass
-
+        
+        # Reserving memory space with zeros
         elif command == '$':
             instruction_counter += operator
 
+        # Reserving byte with value
         elif command == 'K':
             instruction_counter += 1
 
+        # Finish assembly
         elif command == '#':
             break
         
@@ -79,24 +84,25 @@ def assemble(self, filename):
         labels.loc[labels.shape[0]] = [label, adress]
     
     # Second assembly step - assembling instructions
-    obj_code = '{0:b}'.format(start_adress).zfill(8) + '\n'
+    obj_code = '{:b}'.format(start_adress).zfill(16) + '\n'
     for i in lines.index:
         label, command, operator = lines.at[i, 'label'], lines.at[i, 'command'], lines.at[i, 'operator']
-        if operator == '': operator = 0
         if operator in labels['label'].to_list(): operator = labels.set_index('label').at[operator, 'adress']
         
         # Pseudo-instructions
+
+        # Program start adress
         if command == '@':
             pass
 
-        # Reserving memory space with zero
+        # Reserving memory space with zeros
         elif command == '$':
             for i in range(operator):
                 obj_code += ''.zfill(8) + '\n'
 
         # Reserving byte with value
         elif command == 'K':
-            obj_code +='{0:b}'.format(operator).zfill(8) + '\n'
+            obj_code +='{:b}'.format(operator).zfill(8) + '\n'
 
         # Finish assembly
         elif command == '#':
@@ -106,7 +112,7 @@ def assemble(self, filename):
         # Regular instruction
         elif command in mnemonic_table['mnemonic'].to_list():
             opcode = mnemonic_table.set_index('mnemonic').at[command, 'opcode']
-            obj_code +='{0:b}'.format(opcode).zfill(4) + '{0:b}'.format(operator).zfill(12) + '\n'
+            obj_code +='{:b}'.format(opcode).zfill(4) + '{:b}'.format(operator).zfill(12) + '\n'
 
         # If not valid instruction, assembly error
         else: raise AssemblyError('Bad instruction: ' + command)
