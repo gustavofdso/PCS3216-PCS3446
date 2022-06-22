@@ -37,10 +37,7 @@ def assemble(self, filename):
                 operator = content[2]
         except Exception: pass
 
-        if operator != '':
-            if operator[0] == '=': operator = int(operator[1:], 10)
-            elif operator[0] == '#': operator = int(operator[1:], 2)
-            elif operator[0] == '/': operator = int(operator[1:], 16)
+        if operator != '': operator = self.base_to_number(operator)
 
         lines.loc[lines.shape[0]] = [label, command, operator]
 

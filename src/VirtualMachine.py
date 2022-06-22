@@ -1,4 +1,4 @@
-import pandas as pd
+import argparse
 from ctypes import c_uint8, c_uint16, c_int8
 
 class VirtualMachineError(Exception): pass
@@ -20,7 +20,7 @@ class VirtualMachine:
     from src.load import load
     from src.dump import dump, hex_dump
 
-    # Get data from memory
+    # Get adress for memory acess
     def get_indirect_adress(self, adress):
         if self.indirect_mode:
             adress = self.memory[self.current_bank][adress].value << 8 | self.memory[self.current_bank][adress + 1].value
@@ -28,6 +28,15 @@ class VirtualMachine:
         self.indirect_mode = False
 
         return adress
+
+    def base_to_number(self, number):
+        if number[0] == '=': number = int(number[1:], 10)
+        elif number[0] == '#': number = int(number[1:], 2)
+        elif number[0] == '/': number = int(number[1:], 16)
+        try: number = int(number, 10)
+        except Exception: pass
+
+        return number
 
     # Defining machine instructions
     from src.instructions import (
@@ -39,6 +48,7 @@ class VirtualMachine:
 
     # Defining execution algorithm 
     def fetch_instruction(self):
+        # Fetching instruction and updating program counter
         self.instruction_register.value = self.memory[self.current_bank.value][self.program_counter.value].value << 8 | self.memory[self.current_bank.value][self.program_counter.value + 1].value
         self.program_counter.value += 2
 
@@ -62,8 +72,9 @@ class VirtualMachine:
         elif opcode == 0xE: self._put_data()
         elif opcode == 0xF: self._operating_system()
 
-    def run_code(self, step = True):
-        self.program_counter = c_uint16(0x0)
+    def run_code(self, start_position, step = True):
+        start_position = self.base_to_number(start_position)
+        self.program_counter = c_uint16(start_position)
         self.running = True
         while self.running:
             self.fetch_instruction()
@@ -73,47 +84,61 @@ class VirtualMachine:
     def run(self):
         print('Enter a command!')
         while True:
-            msg = input('$').split()
+            msg = input('$ ').split()
             command = msg[0].upper()
+            parser = argparse.ArgumentParser()
             try:
-                # TODO: fazer pyparsing com flags
                 if command == 'HELP':
                     print(
 """
-Help!
-Valid commands are:
+* HELP          - Briefs the commands.
+    usage: HELP
+* ASM           - Assembles a source code file.
+    usage: ASM FILENAME
+* LOAD          - Loads a file into memory.
+    usage: LOAD FILENAME
+* DUMP          - Dumps a file from memory.
+    usage: DUMP FILENAME [-p POSITION] [-s SIZE]
 
-* HELP      - Briefs the commands.
-* ASM       - Assembles a source code file
-    Type 'ASM <source>' with a source.asm file within the source directory
-* LOAD      - Loads a file into memory
-    Type 'LOAD <object>' with a object.obj file within the object directory
-* DUMP      - Dumps a file from memory
-    Type 'DUMP <position> <size> <object>' to dump a file within the object directory
-* RUN       - Run code starting from memory position 0x0
-    Type 'RUN' or 'RUN STEP' to start running code
-* EXIT      - Stops the command interpreter
+    options:
+        -p      Selects the start position for the code. Default 0x0
+        -s      Selects the size for the code in bytes. Default 16
+        --hex   Selects if the dump should be to file or hexadecimal to screen. Default False
+* RUN       - Run code.
+    usage: RUN [-p POSITION] [--step]
+
+    options:
+        -p      Selects the start position for the code. Default 0x0
+        --step  Selects if the code should be run step by step. Default False
+* EXIT      - Stops the command interpreter.
+    usage: EXIT
 """
                     )
                 elif command == 'ASM':
-                    source = msg[1]
-                    self.assemble(source)
+                    kwargs, args = parser.parse_known_args(msg)
+                    kwargs = vars(kwargs)
+                    self.assemble(args[1])
                 elif command == 'LOAD':
-                    source = msg[1]
-                    self.load(source)
+                    kwargs, args = parser.parse_known_args(msg)
+                    kwargs = vars(kwargs)
+                    self.load(args[1])
                 elif command == 'DUMP':
-                    source, position, size = msg[1:4]
-                    self.dump(position, size, source)
+                    parser.add_argument('-p', default = '0', type = str)
+                    parser.add_argument('-s', default = '16', type = str)
+                    parser.add_argument('--hex', action = "store_true")
+                    kwargs, args = parser.parse_known_args(msg)
+                    kwargs = vars(kwargs)
+                    if kwargs['hex']:self.hex_dump(kwargs['p'], kwargs['s'])
+                    else: self.dump(kwargs['p'], kwargs['s'], args[1])
                 elif command == 'RUN':
-                    if len(msg) == 1:
-                        self.run_code(step = False)
-                    else:
-                        step = msg[1].upper()
-                        if step == 'STEP': self.run_code(step = True)
-                        else: print("Type 'RUN' or 'RUN STEP' to start running code")
+                    parser.add_argument('-p', default = '0', type = str)
+                    parser.add_argument('--step', action = "store_true")
+                    kwargs, args = parser.parse_known_args(msg)
+                    kwargs = vars(kwargs)
+                    self.run_code(kwargs['p'], step = kwargs['step'])
                 elif command == 'EXIT':
                     print('Exiting command interpreter!')
                     break
                 else:
-                    print("Invalid command! Type 'HELP'!")
+                    print("Invalid command! Type HELP!")
             except Exception as e: print(e.__class__.__name__ + ': ' + str(e), "\n\nType 'HELP'!")

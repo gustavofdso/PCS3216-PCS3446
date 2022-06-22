@@ -54,6 +54,7 @@ def _move_to_memory(self):
     adress = self.get_indirect_adress(operand)
     self.memory[self.current_bank.value][adress] = self.accumulator
 
+# Enter a subroutine
 def _subroutine_call(self):
     operand = self.instruction_register.value & 0x0FFF
     next_instr = self.program_counter.value
@@ -62,11 +63,13 @@ def _subroutine_call(self):
     self.memory[self.current_bank.value][operand + 1].value = next_instr & 0xFF
 
     self.program_counter.value = operand + 2
-    
+
+# Return from a subroutine
 def _return_from_subroutine(self):
     # TODO: fazer essa func
     pass
     
+# Halt the machine or turn on/off the memory indirect mode
 def _halt_machine(self):
     operand = (self.instruction_register.value & 0x0F00) >> 8
 
@@ -79,12 +82,15 @@ def _halt_machine(self):
     elif operand == 0b0001: self.indirect_mode = True
     elif operand == 0b0010: self.indirect_mode = False
 
+# Get a value into the accumulator
 def _get_data(self):
     self.accumulator = c_int8(input('Enter ACC => '))
 
+# Put a value from the accumulator
 def _put_data(self):
     print('ACC => {:04d}'.format(self.accumulator.value))
     
+# Make an OS call
 def _operating_system(self):
     operand = (self.instruction_register.value & 0x0F00) >> 8
 
