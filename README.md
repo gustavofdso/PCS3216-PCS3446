@@ -43,67 +43,67 @@ A máquina virtual é capaz de montar programas em linguagem simbólica. Para is
 
 * `JP` JUMP - causa um salto incondicional para o endereço de destino.
     * Estrutura da instrução:
-        [15:12] => opcode
-        [11:0]  => operando
+        * [15:12] => opcode
+        * [11:0]  => operando
 
 * `JZ` JUMP IF ZERO - causa um salto para o endereço de destino se o conteúdo no acumulador for nulo.
     * Estrutura da instrução:
-        [15:12] => opcode
-        [11:0]  => operando
+        * [15:12] => opcode
+        * [11:0]  => operando
 
 * `JN` JUMP IF NEGATIVE - causa um salto para o endereço de destino se o conteúdo no acumulador for negativo.
     * Estrutura da instrução:
-        [15:12] => opcode
-        [11:0]  => operando
+        * [15:12] => opcode
+        * [11:0]  => operando
 
 * `LV` LOAD VALUE - carrega um valor imediato no acumulador.
     * Estrutura da instrução:
-        [15:12] => opcode
-        [7:0]  => operando
+        * [15:12] => opcode
+        * [7:0]  => operando
 
 * `+` ADD - soma um valor armazenado na memória com o acumulador, e armazena o resultado no acumulador.
     * Estrutura da instrução:
-        [15:12] => opcode
-        [11:0]  => operando
+        * [15:12] => opcode
+        * [11:0]  => operando
 
 * `-` SUBTRACT - subtrai um valor armazenado na memória do acumulador, e armazena o resultado no acumulador.
     * Estrutura da instrução:
-        [15:12] => opcode
-        [11:0]  => operando
+        * [15:12] => opcode
+        * [11:0]  => operando
 
 * `*` MULTIPLY - multiplica o acumulador por um valor armazenado na memória, e armazena o resultado no acumulador.
     * Estrutura da instrução:
-        [15:12] => opcode
-        [11:0]  => operando
+        * [15:12] => opcode
+        * [11:0]  => operando
 
 * `/` DIVIDE - divide o acumulador por um valor armazenado na memória, e armazena o resultado no acumulador.
     * Estrutura da instrução:
-        [15:12] => opcode
-        [11:0]  => operando
+        * [15:12] => opcode
+        * [11:0]  => operando
 
 * `LD` LOAD - carrega o acumulador com um valor armazenado na memória.
     * Estrutura da instrução:
-        [15:12] => opcode
-        [11:0]  => operando
+        * [15:12] => opcode
+        * [11:0]  => operando
 
 * `MM` MOVE TO MEMORY - escreve num endereço de memória o valor do acumulador.
     * Estrutura da instrução:
-        [15:12] => opcode
-        [11:0]  => operando
+        * [15:12] => opcode
+        * [11:0]  => operando
 
 * `SC` SUBROUTINE CALL - escreve o valor do program counter no link register, e desvia incondicionalmente.
     * Estrutura da instrução:
-        [15:12] => opcode
-        [11:0]  => operando
+        * [15:12] => opcode
+        * [11:0]  => operando
 
 * `RS` RETURN FROM SUBROUTINE - escreve o valor do link register no program counter.
     * Estrutura da instrução:
-        [15:12] => opcode
+        * [15:12] => opcode
 
 * `HM` HALT MACHINE - causa um halt na máquina, ou muda o modo de endereçamento.
     * Estrutura da instrução:
-        [15:12] => opcode
-        [11:8]  => operando
+        * [15:12] => opcode
+        * [11:8]  => operando
 
     * Operando:
         `0000` => Causa um halt na máquina.
@@ -112,16 +112,16 @@ A máquina virtual é capaz de montar programas em linguagem simbólica. Para is
 
 * `GD` GET DATA - pede para que o usuário entre com um dado, que é inserido no acumulador.
     * Estrutura da instrução:
-        [15:12] => opcode
+        * [15:12] => opcode
 
 * `PD` PUT DATA - imprime na tela o dado do acumulador.
     * Estrutura da instrução:
-        [15:12] => opcode
+        * [15:12] => opcode
 
 * `OS` OPERATING SYSTEM - imprime na tela o atual estado da máquina, ou encerra a execução do progama.
     * Estrutura da instrução:
-        [15:12] => opcode
-        [11:8]  => operando
+        * [15:12] => opcode
+        * [11:8]  => operando
 
     * Operando:
         `0000` => Imprime na tela o atual estado da máquina.
@@ -130,17 +130,17 @@ A máquina virtual é capaz de montar programas em linguagem simbólica. Para is
 #### Pseudo-instruções
 
 * `@` ORG - indica a o endereço absoluto de origem ao montador.
-    Sintaxe da operador:
-        [15:12] => identificador do banco de memória.
-        [11:0]  => endereço inicial do código seguinte.
+    * Sintaxe da operador:
+        * [15:12] => identificador do banco de memória.
+        * [11:0]  => endereço inicial do código seguinte.
 
 * `K` BYTE - reserva um byte de memória com um imediato.
-    Sintaxe da operador:
-        [15:0] => imedito a ser carregado.
+    * Sintaxe da operador:
+        * [15:0] => imedito a ser carregado.
 
 * `$` SPACE - reserva um número de bytes nulos de memória.
-    Sintaxe da operador:
-        [15:0] => número de bytes nulos que devem ser reservados.
+    * Sintaxe da operador:
+        * [15:0] => número de bytes nulos que devem ser reservados.
 
 * `#` END - indica a origem absoluta ao montador.
 
@@ -170,18 +170,18 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
     * Sintaxe do comando:
         `$ DUMP FILENAME [-s SIZE] [-a ADRESS] [-b BANK] [--hex]`
     * Opções:
-        `-s` seleciona o tamanho em bytes de memória a ser descarregada. O valor é de 16 por padrão.
-        `-a` seleciona o endereço inicial de memória a ser descarregado. O valor é de 0x0 por padrão.
-        `-b` seleciona o banco de memória a ser descarregado. O valor é de 0x0 por padrão.
-        `--hex` seleciona se a memória deve ser emitido num arquivo ou impresso na tela. Por padrão, a memória é emitida num arquivo.
+        * `-s` seleciona o tamanho em bytes de memória a ser descarregada. O valor é de 16 por padrão.
+        * `-a` seleciona o endereço inicial de memória a ser descarregado. O valor é de 0x0 por padrão.
+        * `-b` seleciona o banco de memória a ser descarregado. O valor é de 0x0 por padrão.
+        * `--hex` seleciona se a memória deve ser emitido num arquivo ou impresso na tela. Por padrão, a memória é emitida num arquivo.
 
 * `$ RUN` roda código binário numa posição de memória.
     * Sintaxe do comando:
         `$ RUN [-a ADRESS] [-b BANK] [--step]`
     * Opções:
-        `-a` seleciona o endereço inicial de memória do código a ser rodado. O valor é de 0x0 por padrão.
-        `-b` seleciona o banco de memória do código a ser rodado. O valor é de 0x0 por padrão.
-        `--step` seleciona se o código deve ser rodado passo-a-passo. Por padrão, o código é rodado de uma vez.
+        * `-a` seleciona o endereço inicial de memória do código a ser rodado. O valor é de 0x0 por padrão.
+        * `-b` seleciona o banco de memória do código a ser rodado. O valor é de 0x0 por padrão.
+        * `--step` seleciona se o código deve ser rodado passo-a-passo. Por padrão, o código é rodado de uma vez.
 
 * `$ EXIT` sai do interpretador de comandos e finaliza o programa.
     * Sintaxe do comando:
