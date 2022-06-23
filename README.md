@@ -142,7 +142,7 @@ A máquina virtual é capaz de montar programas em linguagem simbólica. Para is
     * Sintaxe do operador:
         * [15:0] => número de bytes nulos que devem ser reservados.
 
-* `#` END - indica a origem absoluta ao montador.
+* `#` END - indica o final físico do código a ser montado.
 
 --------------------
 
