@@ -130,16 +130,16 @@ A máquina virtual é capaz de montar programas em linguagem simbólica. Para is
 #### Pseudo-instruções
 
 * `@` ORG - indica a o endereço absoluto de origem ao montador.
-    * Sintaxe da operador:
+    * Sintaxe do operador:
         * [15:12] => identificador do banco de memória.
         * [11:0]  => endereço inicial do código seguinte.
 
 * `K` BYTE - reserva um byte de memória com um imediato.
-    * Sintaxe da operador:
+    * Sintaxe do operador:
         * [15:0] => imedito a ser carregado.
 
 * `$` SPACE - reserva um número de bytes nulos de memória.
-    * Sintaxe da operador:
+    * Sintaxe do operador:
         * [15:0] => número de bytes nulos que devem ser reservados.
 
 * `#` END - indica a origem absoluta ao montador.
