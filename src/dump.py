@@ -1,7 +1,7 @@
 def dump(self, filename, size, start_adress, bank):
-    start_adress = self.string_to_number(start_adress)
-    bank = self.string_to_number(bank)
-    size = self.string_to_number(size)
+    start_adress = self.process_operator(start_adress)
+    bank = self.process_operator(bank)
+    size = self.process_operator(size)
 
     obj_code = '{:b}'.format(bank).zfill(4) + '{:b}'.format(start_adress).zfill(12) + '\n'
     for relative_adress in range(size):
@@ -14,9 +14,9 @@ def dump(self, filename, size, start_adress, bank):
         f.close()
 
 def hex_dump(self, size, start_adress, bank):
-    start_adress = self.string_to_number(start_adress)
-    bank = self.string_to_number(bank)
-    size = self.string_to_number(size)
+    start_adress = self.process_operator(start_adress)
+    bank = self.process_operator(bank)
+    size = self.process_operator(size)
 
     print('Memory bank: {:d}'.format(bank))
     for relative_adress in range(size):

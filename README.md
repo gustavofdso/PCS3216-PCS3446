@@ -129,7 +129,11 @@ A máquina virtual é capaz de montar programas em linguagem simbólica. Para is
 
 #### Pseudo-instruções
 
-* `@` ORG - indica a o endereço absoluto de origem ao montador.
+* `<` EXT - indica que um label é um entry point externo ao programa ao ligador.
+
+* `>` ENT - indica que um label é um entry point interno ao programa ao ligador.
+
+* `@` ORG - indica o endereço absoluto de origem ao montador.
     * Sintaxe do operador:
         * [15:12] => identificador do banco de memória.
         * [11:0]  => endereço inicial do código seguinte.

@@ -1,4 +1,5 @@
 import argparse
+import pandas as pd
 import os
 from ctypes import c_uint8, c_uint16, c_int8
 
@@ -15,24 +16,35 @@ class VirtualMachine:
         self.instruction_register = c_uint16(0)
         self.accumulator = c_int8(0)
 
+        # Initializing instructions table
+        self.mnemonic_table = pd.DataFrame(
+            (
+                ('JP', 0x0, self._jump),
+                ('JZ', 0x1, self._jump_if_negative),
+                ('JN', 0x2, self._jump_if_zero),
+                ('LV', 0x3, self._load_value),
+                ('+' , 0x4, self._add),
+                ('-' , 0x5, self._subtract),
+                ('*' , 0x6, self._multiply),
+                ('/' , 0x7, self._divide),
+                ('LD', 0x8, self._load),
+                ('MM', 0x9, self._move_to_memory),
+                ('SC', 0xA, self._subroutine_call),
+                ('RS', 0xB, self._return_from_subroutine),
+                ('HM', 0xC, self._halt_machine),
+                ('GD', 0xD, self._get_data),
+                ('PD', 0xE, self._put_data),
+                ('OS', 0xF, self._operating_system)
+            ), columns = ['mnemonic', 'opcode', 'instruction']
+        )
+
+        # Initializing labels for program linking
+        self.linker_labels = pd.DataFrame(columns = ['label', 'adress'])
+
     # Defining machine system programs
     from src.assemble import assemble
     from src.load import load
     from src.dump import dump, hex_dump
-
-    # Showing available files
-    def show_files(self):
-        # Showing ASM files
-        path_source = './source/'
-        print('Available files for ASM:')
-        for filename in os.listdir(path_source):
-            if '.asm' in filename.lower(): print('\t' + filename.lower().replace('.asm', ''))
-        
-        # Showing OBJ files
-        path_object = './object/'
-        print('\nAvailable files for LOAD:')
-        for filename in os.listdir(path_object):
-            if '.obj' in filename.lower(): print('\t' + filename.lower().replace('.obj', ''))
 
     # Get adress for memory acess
     def get_indirect_adress(self, adress):
@@ -40,11 +52,10 @@ class VirtualMachine:
             adress = self.memory[self.current_bank][adress].value << 8 | self.memory[self.current_bank][adress + 1].value
             adress &= 0x0FFF
         self.indirect_mode = False
-
         return adress
 
     # Defining string to number conversion
-    def string_to_number(self, number):
+    def process_operator(self, number):
         if number[0] == '=': number = int(number[1:], 10)
         elif number[0] == '#': number = int(number[1:], 2)
         elif number[0] == '/': number = int(number[1:], 16)
@@ -71,26 +82,11 @@ class VirtualMachine:
     def execute_instruction(self):
         # Getting opcode and executing instruction
         opcode = (self.instruction_register.value & 0xF000) >> 12
-        if   opcode == 0x0: self._jump()
-        elif opcode == 0x1: self._jump_if_zero()
-        elif opcode == 0x2: self._jump_if_negative()
-        elif opcode == 0x3: self._load_value()
-        elif opcode == 0x4: self._add()
-        elif opcode == 0x5: self._subtract()
-        elif opcode == 0x6: self._multiply()
-        elif opcode == 0x7: self._divide()
-        elif opcode == 0x8: self._load()
-        elif opcode == 0x9: self._move_to_memory()
-        elif opcode == 0xA: self._subroutine_call()
-        elif opcode == 0xB: self._return_from_subroutine()
-        elif opcode == 0xC: self._halt_machine()
-        elif opcode == 0xD: self._get_data()
-        elif opcode == 0xE: self._put_data()
-        elif opcode == 0xF: self._operating_system()
+        self.mnemonic_table.set_index('opcode').at[opcode, 'instruction']()
 
     def run_code(self, start_adress, bank, step = False):
-        self.program_counter.value = self.string_to_number(start_adress)
-        self.current_bank.value = self.string_to_number(bank)
+        self.program_counter.value = self.process_operator(start_adress)
+        self.current_bank.value = self.process_operator(bank)
 
         # Running sequential instructions
         self.running = True
@@ -100,9 +96,9 @@ class VirtualMachine:
             if step:
                 input()
                 print(
-                    'Machine status:\n'
-                    '\tACC => {:d}\n'.format(self.accumulator.value),
-                    '\tPC  => {:#05X}\n'.format(self.program_counter.value),
+                    'Step! Machine status:',
+                    '\tACC => {:03d}'.format(self.accumulator.value),
+                    '\tPC  => {:#05X}'.format(self.program_counter.value),
                     '\tRI  => {:#05X}'.format(self.instruction_register.value)
                 )
 
@@ -144,8 +140,19 @@ class VirtualMachine:
     usage: $ EXIT
 """
                     )
+
                 if command == 'DIR':
-                    self.show_files()
+                    # Showing ASM files
+                    path_source = './source/'
+                    print('Available files for ASM:')
+                    for filename in os.listdir(path_source):
+                        if '.asm' in filename.lower(): print('\t' + filename.lower().replace('.asm', ''))
+                    
+                    # Showing OBJ files
+                    path_object = './object/'
+                    print('\nAvailable files for LOAD:')
+                    for filename in os.listdir(path_object):
+                        if '.obj' in filename.lower(): print('\t' + filename.lower().replace('.obj', ''))
 
                 elif command == 'ASM':
                     kwargs, args = parser.parse_known_args(msg)
@@ -164,10 +171,8 @@ class VirtualMachine:
                     parser.add_argument('--hex', action = "store_true")
                     kwargs, args = parser.parse_known_args(msg)
                     kwargs = vars(kwargs)
-                    if kwargs['hex']:
-                        self.hex_dump(kwargs['s'], kwargs['a'], kwargs['b'])
-                    else:
-                        self.dump(args[1], kwargs['s'],  kwargs['a'], kwargs['b'])
+                    if kwargs['hex']: self.hex_dump(kwargs['s'], kwargs['a'], kwargs['b'])
+                    else: self.dump(args[1], kwargs['s'],  kwargs['a'], kwargs['b'])
 
                 elif command == 'RUN':
                     parser.add_argument('-a', default = '0', type = str)
@@ -182,7 +187,7 @@ class VirtualMachine:
                     break
 
                 else:
-                    print("Invalid command! Type HELP!")
+                    print("Invalid command! Type HELP to see possible commands.")
             
             except IndexError: print("Incorrect usage for this command! Type HELP to see possible commands.")
             except Exception as e: print(e.__class__.__name__ + ': ' + str(e) + "\n\nType HELP to see possible commands.")

@@ -1,5 +1,3 @@
-from ctypes import c_int8
-
 # Inconditional jump to addresss
 def _jump(self):
     operand = self.instruction_register.value & 0x0FFF
@@ -71,7 +69,9 @@ def _halt_machine(self):
         print('Machine halted! Press ^C to interrupt execution!')
         while True:
             try: pass
-            except KeyboardInterrupt: self.running = False
+            except KeyboardInterrupt:
+                self.running = False
+                break
 
     elif operand == 0b0001: self.indirect_mode = True
     elif operand == 0b0010: self.indirect_mode = False
@@ -82,7 +82,7 @@ def _get_data(self):
 
 # Put a value from the accumulator
 def _put_data(self):
-    print('ACC => {:04d}'.format(self.accumulator.value))
+    print('ACC => {:03d}'.format(self.accumulator.value))
     
 # Make an OS call
 def _operating_system(self):
@@ -91,10 +91,10 @@ def _operating_system(self):
     # Print current state
     if operand == 0b0000:
         print(
-            'OS Call! Machine status:\n'
-            '\tACC => {:d}\n'.format(self.accumulator.value),
+            'OS Call! Machine status:\n',
+            '\tACC => {:03d}\n'.format(self.accumulator.value),
             '\tPC  => {:#05X}\n'.format(self.program_counter.value),
-            '\tRI  => {:#05X}\n'.format(self.instruction_register.value)
+            '\tRI  => {:#05X}'.format(self.instruction_register.value)
         )
 
     # Finish execution
