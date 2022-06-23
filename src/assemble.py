@@ -32,14 +32,17 @@ def assemble(self, filename):
 
         lines.loc[lines.shape[0]] = [label, command, operator]
 
+    if not '#' in lines['command'].to_list(): lines.loc[lines.shape[0]] = [None, '#', None]
+
     lines.dropna(subset = 'command', inplace = True)
     lines['operator'].fillna(0, inplace = True)
-    
-    # Getting bank and memory adress for the code
-    if not '@' in lines['command'].to_list(): raise AssemblyError('Program must have an start adress (missing @)')
-    if not '#' in lines['command'].to_list(): raise AssemblyError('Program must have a physical end (missing #)')
 
-    adress_line = lines[lines['command'] == '@']['operator'].iloc[-1]
+    # Getting bank and memory adress for the code
+    adress_lines = lines[lines['command'] == '@']['operator'].to_list()
+    if len(adress_lines) == 0: raise AssemblyError('Program must have an start adress (missing @).')
+    elif len(adress_lines) >= 2: raise AssemblyError('Multiple start adress defined.')
+
+    adress_line = adress_lines[0]
     bank = (adress_line & 0xF000) >> 12
     start_adress = adress_line & 0x0FFF
 
@@ -66,7 +69,7 @@ def assemble(self, filename):
 
         # Program start adress
         elif command == '@':
-            pass
+            continue
         
         # Reserving memory space with zeros
         elif command == '$':
@@ -87,10 +90,11 @@ def assemble(self, filename):
         # If not valid instruction, assembly error
         else: raise AssemblyError('Bad instruction: ' + command)
 
-        if label is None: continue
+        if label is None:
+            continue
 
         # Checking if a label has been defined twice
-        if label in labels['label'].to_list(): raise AssemblyError('Multiple definition: ' + label)
+        if label in labels['label'].to_list(): raise AssemblyError('Multiple definition of ' + label)
         
         labels.loc[labels.shape[0]] = [label, label_adress]
 
@@ -114,7 +118,7 @@ def assemble(self, filename):
 
         # Program start adress
         if command == '@':
-            pass
+            continue
 
         # Reserving memory space with zeros
         elif command == '$':
@@ -127,7 +131,7 @@ def assemble(self, filename):
 
         # Finish assembly
         elif command == '#':
-            obj_code += '1111111100000000'
+            obj_code += '1111000000001111'
             break
 
         # Regular instruction

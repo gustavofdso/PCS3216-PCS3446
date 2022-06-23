@@ -1,4 +1,7 @@
 # Inconditional jump to addresss
+from py import process
+
+
 def _jump(self):
     operand = self.instruction_register.value & 0x0FFF
     self.program_counter.value = operand
@@ -63,7 +66,7 @@ def _return_from_subroutine(self):
     
 # Halt the machine or turn on/off the memory indirect mode
 def _halt_machine(self):
-    operand = (self.instruction_register.value & 0x0F00) >> 8
+    operand = self.instruction_register.value & 0x000F
 
     if operand == 0b0000:
         print('Machine halted! Press ^C to interrupt execution!')
@@ -78,24 +81,38 @@ def _halt_machine(self):
 
 # Get a value into the accumulator
 def _get_data(self):
-    self.accumulator.value = int(input('Enter ACC => ')) & 0x00FF
+    self.accumulator.value = self.process_operator(input('Enter ACC => ')) & 0x00FF
 
 # Put a value from the accumulator
 def _put_data(self):
-    print('ACC => {:03d}'.format(self.accumulator.value))
+    operand = self.instruction_register.value & 0x000F
+
+    # Decimal form
+    if operand == 0b0000:
+        print('ACC => {:03d}'.format(self.accumulator.value))
+
+    # Binary form
+    elif operand == 0b0001:
+        print('ACC => {:08b}'.format(self.accumulator.value))
+
+    # Hexadecimal form
+    elif operand == 0b0010:
+        print('ACC => {:02X}'.format(self.accumulator.value))
+
+    # Character form
+    elif operand == 0b0011:
+        print('ACC => {:c}'.format(self.accumulator.value))
     
 # Make an OS call
 def _operating_system(self):
-    operand = (self.instruction_register.value & 0x0F00) >> 8
+    operand = self.instruction_register.value & 0x000F
 
     # Print current state
     if operand == 0b0000:
-        print(
-            'OS Call! Machine status:\n',
-            '\tACC => {:03d}\n'.format(self.accumulator.value),
-            '\tPC  => {:#05X}\n'.format(self.program_counter.value),
-            '\tRI  => {:#05X}'.format(self.instruction_register.value)
-        )
+        print('OS Call! Machine status:')
+        print('\tACC => {:03d}'.format(self.accumulator.value))
+        print('\tPC  => {:02X}'.format(self.program_counter.value))
+        print('\tRI  => {:02X}'.format(self.instruction_register.value))
 
     # Finish execution
     elif operand == 0b1111:

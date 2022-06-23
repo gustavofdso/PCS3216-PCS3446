@@ -95,12 +95,10 @@ class VirtualMachine:
             self.execute_instruction()
             if step:
                 input()
-                print(
-                    'Step! Machine status:',
-                    '\tACC => {:03d}'.format(self.accumulator.value),
-                    '\tPC  => {:#05X}'.format(self.program_counter.value),
-                    '\tRI  => {:#05X}'.format(self.instruction_register.value)
-                )
+                print('Step! Machine status:')
+                print('\tACC => {:03d}'.format(self.accumulator.value))
+                print('\tPC  => {:02X}'.format(self.program_counter.value))
+                print('\tRI  => {:02X}'.format(self.instruction_register.value))
 
     def run(self):
         print('Enter a command! Type HELP to see possible commands.')
