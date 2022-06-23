@@ -1,4 +1,5 @@
 import argparse
+import os
 from ctypes import c_uint8, c_uint16, c_int8
 
 class VirtualMachine:
@@ -19,11 +20,25 @@ class VirtualMachine:
     from src.load import load
     from src.dump import dump, hex_dump
 
+    # Showing available files
+    def show_files(self):
+        # Showing ASM files
+        path_source = './source/'
+        print('Available files for ASM:')
+        for filename in os.listdir(path_source):
+            if '.asm' in filename.lower(): print('\t' + filename.lower().replace('.asm', ''))
+        
+        # Showing OBJ files
+        path_object = './object/'
+        print('\nAvailable files for LOAD:')
+        for filename in os.listdir(path_object):
+            if '.obj' in filename.lower(): print('\t' + filename.lower().replace('.obj', ''))
+
     # Get adress for memory acess
     def get_indirect_adress(self, adress):
         if self.indirect_mode:
             adress = self.memory[self.current_bank][adress].value << 8 | self.memory[self.current_bank][adress + 1].value
-            adress &= 0xFFF
+            adress &= 0x0FFF
         self.indirect_mode = False
 
         return adress
@@ -92,7 +107,7 @@ class VirtualMachine:
                 )
 
     def run(self):
-        print('Enter a command!')
+        print('Enter a command! Type HELP to see possible commands.')
         while True:
             msg = input('$ ').split()
             if len(msg) == 0: continue
@@ -103,13 +118,15 @@ class VirtualMachine:
                     print(
 """
 * HELP          - Briefs the commands.
-    usage: HELP
+    usage: $ HELP
+* DIR           - List available files.
+    usage: $ DIR
 * ASM           - Assembles a source code file.
-    usage: ASM FILENAME
+    usage: $ ASM FILENAME
 * LOAD          - Loads a file into memory.
-    usage: LOAD FILENAME
+    usage: $ LOAD FILENAME
 * DUMP          - Dumps a file from memory.
-    usage: DUMP FILENAME [-s SIZE] [-a ADRESS] [-b BANK] [--hex]
+    usage: $ DUMP FILENAME [-s SIZE] [-a ADRESS] [-b BANK] [--hex]
 
     options:
         -s      Selects the size for the code in bytes. Default 16.
@@ -117,16 +134,18 @@ class VirtualMachine:
         -b      Selects the memory bank for the code. Default 0.
         --hex   Selects if the dump should be binary to file or hexadecimal to screen. Default False.
 * RUN       - Run code.
-    usage: RUN [-a ADRESS] [-b BANK] [--step]
+    usage: $ RUN [-a ADRESS] [-b BANK] [--step]
 
     options:
         -a      Selects the start adress for the code. Default 0x0.
         -b      Selects the memory bank for the code. Default 0.
         --step  Selects if the code should be run step by step. Default False.
 * EXIT      - Stops the command interpreter.
-    usage: EXIT
+    usage: $ EXIT
 """
                     )
+                if command == 'DIR':
+                    self.show_files()
 
                 elif command == 'ASM':
                     kwargs, args = parser.parse_known_args(msg)
@@ -165,5 +184,5 @@ class VirtualMachine:
                 else:
                     print("Invalid command! Type HELP!")
             
-            except IndexError: print("Incorrect usage for this command! Type 'HELP'!")
-            except Exception as e: print(e.__class__.__name__ + ': ' + str(e) + "\n\nType 'HELP'!")
+            except IndexError: print("Incorrect usage for this command! Type HELP to see possible commands.")
+            except Exception as e: print(e.__class__.__name__ + ': ' + str(e) + "\n\nType HELP to see possible commands.")

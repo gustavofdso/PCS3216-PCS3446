@@ -78,7 +78,7 @@ def _halt_machine(self):
 
 # Get a value into the accumulator
 def _get_data(self):
-    self.accumulator = c_int8(input('Enter ACC => '))
+    self.accumulator.value = int(input('Enter ACC => ')) & 0x00FF
 
 # Put a value from the accumulator
 def _put_data(self):
