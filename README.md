@@ -50,7 +50,7 @@ A máquina virtual projetada para a elaboração do projeto possui:
 
 ### Linguagem mnemônica
 
-A máquina virtual é capaz de montar programas em linguagem simbólica. Para isso, foi definida uma linguagem a nível de montagem, com opcodes de 4 bits e 16 instruções no total:
+A máquina virtual é capaz de montar programas em linguagem simbólica. Para isso, foi definida uma linguagem a nível de montagem, com opcodes de 4 bits, instruções de 2 bytes e 16 instruções no total:
 
 #### Instruções
 
