@@ -1,5 +1,3 @@
-from ctypes import c_uint8
-
 def load(self, filename):
     # Opening the file and reading lines
     with open('./object/' + filename + '.obj', 'r') as f:

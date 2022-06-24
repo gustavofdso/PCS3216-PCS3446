@@ -1,7 +1,11 @@
-            @       /0000           ; endereço inicial do código na memória
-            JP      START
+; Hello
+; *********
+; Programa que realiza a impressão da frase "Hello, world!".
 
-STRING      K       =72
+            @       /0000           ; endereço inicial do código na memória
+            JP      START           ; iniciando a execução do programa
+
+STRING      K       =72             ; declaração da string, em formato unicode
             K       =101
             K       =108
             K       =108
@@ -17,20 +21,19 @@ STRING      K       =72
             K       =0
 
 ONE         K       =1
-CURR        K       =2
-ADD1        K       =0
-ADD2        K       =0
+ADDR        K       =0
+CURR        K       =2              ; endereço de acesso atual
 
 START       LV      =0
-            +       CURR
-            MM      ADD2
-            HM      /01
-            LD      ADD1
-            JZ      END
-            PD      =3
-            LD      CURR
+            HM      /01             ; ligando o modo de endereçamento indireto
+            LD      ADDR            ; carregando o caracter atual
+            JZ      END             ; se zero, ir para END
+            PD      =3              ; imprimir dado em formato unicode
+            LD      CURR            ; incrementando CURR
             +       ONE
             MM      CURR
-            JP      START
+            JP      START           ; loop
 
-END         OS      /0F
+END         LV      =2              ; voltando ao estado original
+            MM      CURR
+            #                       ; fim do programa

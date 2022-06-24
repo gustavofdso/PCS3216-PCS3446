@@ -131,6 +131,12 @@ A máquina virtual é capaz de montar programas em linguagem simbólica. Para is
     * Estrutura:
         * `[15:12]` => opcode
 
+    * Operando:
+        * `0000` => Imprime o dado em formato decimal.
+        * `0001` => Imprime o dado em formato binário.
+        * `0010` => Imprime o dado em formato hexadecimal.
+        * `0011` => Imprime o dado em formato unicode.
+
 * `OS` OPERATING SYSTEM - imprime na tela o atual estado da máquina, ou encerra a execução do progama.
     * Estrutura:
         * `[15:12]` => opcode
@@ -234,13 +240,148 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
 
 #### Exemplos de código e utilização da máquina.
 
-Primeiramente, será apresentado o programa mais simples de qualquer linguagem, o "hello, world!"
+Para explicar o funcionamento da linguagem simbólica e da máquina virtual com mais detalhes, serão apresentados códigos exemplo, construídos na linguagem de montagem definida.
 
 * hello.asm
 
+Primeiramente, será apresentado o programa mais simples de qualquer linguagem de programação, o "hello, world!"
 
+Nesse programa, possuímos como objetivo a impressão ao usuário da frase "Hello, world!".
 
-Agora, será apresentado um exemplo mais complexo, que faz o uso do ligador para executar código em arquivos separados.
+É adicionado o endereço de origem do código. É adicionada também uma instrução de `JP`, para indicar que o código deve ser iniciado na label `START`.
+
+```
+; Hello
+; *********
+; Programa que realiza a impressão da frase "Hello, world!".
+
+            @       /0000           ; endereço inicial do código na memória
+            JP      START           ; iniciando a execução do programa
+```
+
+São declarados os dados da string em bytes, em seu formato unicode. O zero demarca o fim da string.
+
+```
+STRING      K       =72             ; declaração da string, em formato unicode
+            K       =101
+            K       =108
+            K       =108
+            K       =111
+            K       =44
+            K       =32
+            K       =119
+            K       =111
+            K       =114
+            K       =108
+            K       =100
+            K       =33
+            K       =0
+```
+
+Em seguida, é feito um loop na string, utilizado a instrução `PD` para imprimir os dados na tela em formato unicode. Quando o acumulador é zero, o programa desvia para o final do programa, na label `END`
+
+```
+ONE         K       =1
+ADDR        K       =0
+CURR        K       =2              ; endereço de acesso atual
+
+START       LV      =0
+            HM      /01             ; ligando o modo de endereçamento indireto
+            LD      ADDR            ; carregando o caracter atual
+            JZ      END             ; se zero, ir para END
+            PD      =3              ; imprimir dado em formato unicode
+            LD      CURR            ; incrementando CURR
+            +       ONE
+            MM      CURR
+            JP      START           ; loop
+
+END         LV      =2              ; voltando ao estado original
+            MM      CURR
+            #                       ; fim do programa
+```
+
+Para executar esse programa, basta seguir a seguinte interação com a máquina virtual:
+
+```
+Enter a command! Type HELP to see possible commands.
+$ ASM hello  
+$ LOAD hello
+$ RUN -a 0 -b 0
+ACC => H
+ACC => e
+ACC => l
+ACC => l
+ACC => o
+ACC => ,
+ACC =>  
+ACC => w
+ACC => o
+ACC => r
+ACC => l
+ACC => d
+ACC => !
+$
+```
 
 * somador.asm e soma.asm
 
+Agora, será apresentado um exemplo mais complexo, que faz o uso do ligador para executar código em arquivos separados.
+
+A sub-rotina `SOMADOR` faz o uso de entry-points para realiza a soma de dois valores armazenados na memória. Ao final da sub-rotina, a instrução `RS` é utilizada para retornar o program counter para o fluxo principal, visto que esse registrador foi salvo no link register.
+
+```
+; Somador
+; *********
+; Subrotina que realiza uma soma de dois valores na memória, e deposita o resultado no acumulador.
+
+SOMADOR     >                       ; cabeçalho - definindo entry-points
+ENTRADA1    >
+ENTRADA2    >
+
+            @       /00FF           ; endereço inicial do código na memória
+            JP      SOMADOR
+ENTRADA1    K       =0              ; valor 1 a somar
+ENTRADA2    K       =0              ; valor 2 a somar
+SOMADOR     LD      ENTRADA1        ; realizando a soma
+            +       ENTRADA2
+            RS                      ; retornando da sub-rotina
+```
+
+O programa `SOMA` testa a chamada do somador, visto que os entry-points externos utilizados na sub-rotina têm de ser resolvidos pelo ligador. As variáveis são passadas na memória, e logo a sub-rotina é chamada.
+
+```
+; Soma
+; *********
+; Programa principal que chama o somador.
+
+SOMADOR     <                       ; cabeçalho - definindo entry-points
+ENTRADA1    <
+ENTRADA2    <
+SAIDA       >
+
+            @       /0000           ; endereço inicial do código na memória
+            JP      INICIO
+VALOR1      K       =50             ; valor 1 a somar
+VALOR2      K       #101101         ; valor 2 a somar
+SAIDA       K       /0000           ; endereço de salvamento da soma
+INICIO      LD      VALOR1          ; passando as variáveis na memória
+            MM      ENTRADA1
+            LD      VALOR2
+            MM      ENTRADA2
+            SC      SOMADOR         ; chamando o somador
+            PD      =0              ; exibindo dados na tela
+            #                       ; fim do programa
+```
+
+Para executar esse programa, basta seguir a seguinte interação com a máquina virtual:
+
+```
+Enter a command! Type HELP to see possible commands.
+$ ASM somador
+$ LOAD somador
+$ ASM soma
+$ LOAD soma
+$ RUN -a 0 -b 0
+ACC => 095
+$
+```
