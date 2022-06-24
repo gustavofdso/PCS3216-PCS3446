@@ -1,3 +1,5 @@
+def LoadError(Exception): pass
+
 def load(self, filename):
     # Opening the file and reading lines
     with open('./object/' + filename + '.obj', 'r') as f:
@@ -13,6 +15,6 @@ def load(self, filename):
     relative_adress = 0
     for i in splitted_code[2:]:
         # Saving byte to memory
-        if start_adress + relative_adress >= len(self.memory[bank]): break
+        if start_adress + relative_adress >= len(self.memory[bank]): raise(LoadError("Memory overflow on load!"))
         self.memory[bank][start_adress + relative_adress].value = int(i, 2)
         relative_adress += 1
