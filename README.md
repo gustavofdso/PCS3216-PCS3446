@@ -238,7 +238,9 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
     * Sintaxe:
         `$ EXIT`
 
-#### Exemplos de código e utilização da máquina.
+--------------------
+
+### Exemplos de código e utilização da máquina.
 
 Para explicar o funcionamento da linguagem simbólica e da máquina virtual com mais detalhes, serão apresentados códigos exemplo, construídos na linguagem de montagem definida.
 
