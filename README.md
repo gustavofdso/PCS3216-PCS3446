@@ -209,6 +209,10 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
     * Sintaxe:
         `$ DIR`
 
+* `$ STA` imprime o estado atual da máquina.
+    * Sintaxe:
+        `$ STA`
+
 * `$ ASM` monta um arquivo com código em linguagem mnemônica, gerando um arquivo com código em linguagem de máquina pronto para ser carregado. Faz a ligação com entry-points externos e atualiza a tabela de entry-points do ligador.
     * Sintaxe:
         `$ ASM FILENAME`

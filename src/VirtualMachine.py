@@ -76,6 +76,7 @@ class VirtualMachine:
         print('\tACC => {0:03d}, 0b{0:08b}, 0x{0:04X}'.format(self.accumulator.value))
         print('\tPC  => 0x{:04X}'.format(self.program_counter.value))
         print('\tRI  => 0x{:04X}'.format(self.instruction_register.value))
+        print('\tLR  => 0x{:04X}'.format(self.link_register.value))
 
     # Defining execution algorithm 
     def fetch_instruction(self):
@@ -117,6 +118,8 @@ class VirtualMachine:
     usage: $ HELP
 * DIR           - List available files.
     usage: $ DIR
+* STA           - Show the current status for the registers.
+    usage: $ STA
 * ASM           - Assembles a source code file.
     usage: $ ASM FILENAME
 * LOAD          - Loads a file into memory.
@@ -153,6 +156,10 @@ class VirtualMachine:
                     print('\nAvailable files for LOAD:')
                     for filename in os.listdir(path_object):
                         if '.obj' in filename.lower(): print('\t' + filename.lower().replace('.obj', ''))
+                        
+                elif command == 'STA':
+                    print('Machine status:')
+                    self.show_status()
 
                 elif command == 'ASM':
                     kwargs, args = parser.parse_known_args(msg)
