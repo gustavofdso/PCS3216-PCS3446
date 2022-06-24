@@ -209,7 +209,7 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
     * Sintaxe:
         `$ DIR`
 
-* `$ STA` imprime o estado atual da máquina.
+* `$ STA` imprime o estado atual dos registradores da máquina virtual.
     * Sintaxe:
         `$ STA`
 

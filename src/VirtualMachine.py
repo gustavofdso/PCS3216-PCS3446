@@ -116,9 +116,9 @@ class VirtualMachine:
 """
 * HELP          - Briefs the commands.
     usage: $ HELP
-* DIR           - List available files.
+* DIR           - Lists available files.
     usage: $ DIR
-* STA           - Show the current status for the registers.
+* STA           - Shows the current status for the virtual machine's registers.
     usage: $ STA
 * ASM           - Assembles a source code file.
     usage: $ ASM FILENAME
@@ -156,7 +156,7 @@ class VirtualMachine:
                     print('\nAvailable files for LOAD:')
                     for filename in os.listdir(path_object):
                         if '.obj' in filename.lower(): print('\t' + filename.lower().replace('.obj', ''))
-                        
+
                 elif command == 'STA':
                     print('Machine status:')
                     self.show_status()
