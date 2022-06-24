@@ -1,4 +1,4 @@
-def DumpError(Exception): pass
+class DumpError(Exception): pass
 
 def dump(self, filename, size, start_adress, bank):
     start_adress = self.process_operator(start_adress)
@@ -7,7 +7,7 @@ def dump(self, filename, size, start_adress, bank):
 
     obj_code = '{:04b}'.format(bank) + '{:012b}'.format(start_adress) + '\n'
     for relative_adress in range(size):
-        if start_adress + relative_adress >= len(self.memory[bank]): raise(DumpError("Memory overflow on dump!"))
+        if start_adress + relative_adress >= len(self.memory[bank]): raise DumpError("Memory overflow on dump!")
         obj_code += '{:08b}'.format(self.memory[bank][start_adress + relative_adress].value) + '\n'
 
     # Opening the file and dumping the memory lines
@@ -22,7 +22,7 @@ def hex_dump(self, size, start_adress, bank):
     
     print('Memory bank: {:02d}'.format(bank))
     for relative_adress in range(size):
-        if start_adress + relative_adress >= len(self.memory[bank]): raise(DumpError("Memory overflow on dump!"))
+        if start_adress + relative_adress >= len(self.memory[bank]): raise DumpError("Memory overflow on dump!")
         print(
             '{:03X}'.format(start_adress + relative_adress),
             '=>',
