@@ -44,7 +44,7 @@ A máquina virtual projetada para a elaboração do projeto possui:
 
 * Assembler: lê um arquivo contendo código fonte em linguagem mnemônica, e gera um arquivo contendo código objeto em linguagem de máquina, pronto pra ser carregado por um loader.
 
-* Linker: liga entry-points entre programas, armazenando endereços numa tabela de símbolos. Faz a ligação entre os programas, fazendo com que programas possam chamar uns aos outros.
+* Linker: liga entry-points entre programas, armazenando endereços numa tabela de símbolos. Permite que programas possam chamar uns aos outros pela resolução de endereços externos.
 
 --------------------
 
