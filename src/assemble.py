@@ -32,8 +32,6 @@ def assemble(self, filename):
 
         lines.loc[lines.shape[0]] = [label, command, operator]
 
-    if not '#' in lines['command'].to_list(): lines.loc[lines.shape[0]] = [None, '#', None]
-
     lines.dropna(subset = 'command', inplace = True)
     lines['operator'].fillna(0, inplace = True)
 
@@ -81,7 +79,7 @@ def assemble(self, filename):
 
         # Finish assembly
         elif command == '#':
-            break
+            pass
         
         # Regular instruction
         elif command in self.mnemonic_table['mnemonic'].to_list():
@@ -99,7 +97,7 @@ def assemble(self, filename):
         labels.loc[labels.shape[0]] = [label, label_adress]
 
     # Second assembly step - assembling instructions
-    obj_code = '{:b}'.format(bank).zfill(4) + '{:b}'.format(start_adress).zfill(12) + '\n'
+    obj_code = '{:04b}'.format(bank) + '{:012b}'.format(start_adress) + '\n'
     for i in lines.index:
         label, command, operator = lines.at[i, 'label'], lines.at[i, 'command'], lines.at[i, 'operator']
         if operator in labels['label'].to_list(): operator = labels.set_index('label').at[operator, 'adress']
@@ -123,21 +121,22 @@ def assemble(self, filename):
         # Reserving memory space with zeros
         elif command == '$':
             for i in range(operator):
-                obj_code += ''.zfill(8) + '\n'
+                obj_code += '00000000' + '\n'
 
         # Reserving byte with value
         elif command == 'K':
-            obj_code +='{:b}'.format(operator).zfill(8) + '\n'
+            operator &= 0xFF
+            obj_code +='{:08b}'.format(operator) + '\n'
 
         # Finish assembly
         elif command == '#':
             obj_code += '1111000000001111'
-            break
 
         # Regular instruction
         elif command in self.mnemonic_table['mnemonic'].to_list():
             opcode = self.mnemonic_table.set_index('mnemonic').at[command, 'opcode']
-            obj_code +='{:b}'.format(opcode).zfill(4) + '{:b}'.format(operator).zfill(12) + '\n'
+            operator &= 0xFFF
+            obj_code +='{:04b}'.format(opcode) + '{:012b}'.format(operator) + '\n'
 
         # If not valid instruction, assembly error
         else: raise AssemblyError('Bad instruction: ' + command)

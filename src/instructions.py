@@ -1,7 +1,4 @@
 # Inconditional jump to addresss
-from py import process
-
-
 def _jump(self):
     operand = self.instruction_register.value & 0x0FFF
     self.program_counter.value = operand
@@ -22,37 +19,37 @@ def _load_value(self):
 # Add value from memory to accumulator
 def _add(self):
     operand = self.instruction_register.value & 0x0FFF
-    adress = self.get_indirect_adress(operand)
+    adress = self.get_target_adress(operand)
     self.accumulator.value += self.memory[self.current_bank.value][adress].value
 
 # Subtract value from memory from accumulator
 def _subtract(self):
     operand = self.instruction_register.value & 0x0FFF
-    adress = self.get_indirect_adress(operand)
+    adress = self.get_target_adress(operand)
     self.accumulator.value -= self.memory[self.current_bank.value][adress].value
 
 # Multiply value from memory by accumulator
 def _multiply(self):
     operand = self.instruction_register.value & 0x0FFF
-    adress = self.get_indirect_adress(operand)
+    adress = self.get_target_adress(operand)
     self.accumulator.value *= self.memory[self.current_bank.value][adress].value
     
 # Divide accumulator by value from memory
 def _divide(self):
     operand = self.instruction_register.value & 0x0FFF
-    adress = self.get_indirect_adress(operand)
+    adress = self.get_target_adress(operand)
     self.accumulator.value //= self.memory[self.current_bank.value][adress].value
 
 # Load accumulator with value from memory
 def _load(self):
     operand = self.instruction_register.value & 0x0FFF
-    adress = self.get_indirect_adress(operand)
+    adress = self.get_target_adress(operand)
     self.accumulator.value = self.memory[self.current_bank.value][adress].value
 
 # Move accumulator to memory
 def _move_to_memory(self):
     operand = self.instruction_register.value & 0x0FFF
-    adress = self.get_indirect_adress(operand)
+    adress = self.get_target_adress(operand)
     self.memory[self.current_bank.value][adress].value = self.accumulator.value
 
 # Enter a subroutine
@@ -93,11 +90,11 @@ def _put_data(self):
 
     # Binary form
     elif operand == 0b0001:
-        print('ACC => {:08b}'.format(self.accumulator.value))
+        print('ACC => 0b{:08b}'.format(self.accumulator.value))
 
     # Hexadecimal form
     elif operand == 0b0010:
-        print('ACC => {:02X}'.format(self.accumulator.value))
+        print('ACC => 0x{:02X}'.format(self.accumulator.value))
 
     # Character form
     elif operand == 0b0011:
@@ -110,9 +107,7 @@ def _operating_system(self):
     # Print current state
     if operand == 0b0000:
         print('OS Call! Machine status:')
-        print('\tACC => {:03d}'.format(self.accumulator.value))
-        print('\tPC  => {:02X}'.format(self.program_counter.value))
-        print('\tRI  => {:02X}'.format(self.instruction_register.value))
+        self.show_status()
 
     # Finish execution
     elif operand == 0b1111:

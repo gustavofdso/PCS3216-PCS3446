@@ -11,6 +11,7 @@ def load(self, filename):
     
     bank = int(splitted_code[0][:3], 2)
     start_adress = int(splitted_code[0][4:] + splitted_code[1], 2)
+    
     relative_adress = 0
     for i in splitted_code[2:]:
         # Saving byte to memory

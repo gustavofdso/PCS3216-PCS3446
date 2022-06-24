@@ -173,15 +173,19 @@ Os códigos na linguagem mnemônica definida são compostos de:
 
 * Código: é feita a sequencialização das instruções ou declaração de dados. Nesse trecho, podem ser utilizadas quaisquer instruções ou pseudo-instruções que não são utilizados em outros trechos do código.
 
-* Final físico: é identificado o final físico do programa. Nesse trecho, devem ser utilizadas apenas pseudo-instruções do tipo `#`. Ao encontrar essa instrução, o montador para a montagem e insere uma chamada de sistema operacional (instrução do tipo `OS`) que causa a interrupção da execução de código.
+* Final físico: é identificado o final físico do programa. Nesse trecho, devem ser utilizadas apenas a pseudo-instrução do tipo `#`. Ao encontrar essa instrução, o montador insere uma chamada de sistema operacional (instrução do tipo `OS`), que causa a interrupção da execução de código.
 
-As instruções e pseudo-instruções devem seguir o seguinte padrão:
+As instruções e pseudo-instruções são compostas de:
 
+* Label: opcional. Indica o nome de uma instrução, e pode ser referenciada em outros pontos do programa ou como entry-points.
 
+* Comando: obrigatório. Indica qual a instrução ou pseudo-instrução, e deve ser um dos mnemônicos listados acima. Linhas sem comandos serão ignoradas pelo montador e ligador.
 
-#### Exemplos
+* Operador: opcional. Embora a maioria da instrução possua um operador, é possível deixá-lo em branco, e o montador irá utilizar o valor 0x0 por padrão.
 
+* Comentário: opcional. Qualquer texto que seja encontrado numa linha de código depois do caracter `;` é considerado um comentário, e será totalmente ignorado pelos programas de sistema.
 
+Ao final desse documento, serão apresentados exemplos de código e sua utilização.
 
 --------------------
 
@@ -228,5 +232,15 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
     * Sintaxe:
         `$ EXIT`
 
-#### Como utilizar a máquina
+#### Exemplos de código e utilização da máquina.
+
+Primeiramente, será apresentado o programa mais simples de qualquer linguagem, o "hello, world!"
+
+* hello.asm
+
+
+
+Agora, será apresentado um exemplo mais complexo, que faz o uso do ligador para executar código em arquivos separados.
+
+* somador.asm e soma.asm
 

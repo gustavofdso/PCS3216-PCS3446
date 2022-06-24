@@ -20,8 +20,8 @@ class VirtualMachine:
         self.mnemonic_table = pd.DataFrame(
             (
                 ('JP', 0x0, self._jump),
-                ('JZ', 0x1, self._jump_if_negative),
-                ('JN', 0x2, self._jump_if_zero),
+                ('JZ', 0x1, self._jump_if_zero),
+                ('JN', 0x2, self._jump_if_negative),
                 ('LV', 0x3, self._load_value),
                 ('+' , 0x4, self._add),
                 ('-' , 0x5, self._subtract),
@@ -41,15 +41,23 @@ class VirtualMachine:
         # Initializing labels for program linking
         self.linker_labels = pd.DataFrame(columns = ['label', 'adress'])
 
+    # Defining machine instructions
+    from src.instructions import (
+        _jump, _jump_if_zero, _jump_if_negative, _load_value,
+        _add, _subtract, _multiply, _divide,
+        _load, _move_to_memory, _subroutine_call, _return_from_subroutine,
+        _halt_machine, _get_data, _put_data, _operating_system
+    )
+
     # Defining machine system programs
     from src.assemble import assemble
     from src.load import load
     from src.dump import dump, hex_dump
 
     # Get adress for memory acess
-    def get_indirect_adress(self, adress):
+    def get_target_adress(self, adress):
         if self.indirect_mode:
-            adress = self.memory[self.current_bank][adress].value << 8 | self.memory[self.current_bank][adress + 1].value
+            adress = self.memory[self.current_bank.value][adress].value << 8 | self.memory[self.current_bank.value][adress + 1].value
             adress &= 0x0FFF
         self.indirect_mode = False
         return adress
@@ -62,16 +70,12 @@ class VirtualMachine:
         else:
             try: number = int(number, 10)
             except Exception: pass
-
         return number
 
-    # Defining machine instructions
-    from src.instructions import (
-        _jump, _jump_if_zero, _jump_if_negative, _load_value,
-        _add, _subtract, _multiply, _divide,
-        _load, _move_to_memory, _subroutine_call, _return_from_subroutine,
-        _halt_machine, _get_data, _put_data, _operating_system
-    )
+    def show_status(self):
+        print('\tACC => {0:03d}, 0b{0:08b}, 0x{0:04X}'.format(self.accumulator.value))
+        print('\tPC  => 0x{:04X}'.format(self.program_counter.value))
+        print('\tRI  => 0x{:04X}'.format(self.instruction_register.value))
 
     # Defining execution algorithm 
     def fetch_instruction(self):
@@ -96,9 +100,7 @@ class VirtualMachine:
             if step:
                 input()
                 print('Step! Machine status:')
-                print('\tACC => {:03d}'.format(self.accumulator.value))
-                print('\tPC  => {:02X}'.format(self.program_counter.value))
-                print('\tRI  => {:02X}'.format(self.instruction_register.value))
+                self.show_status()
 
     def run(self):
         print('Enter a command! Type HELP to see possible commands.')
