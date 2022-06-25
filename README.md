@@ -160,11 +160,11 @@ A máquina virtual é capaz de montar programas em linguagem simbólica. Para is
 
 * `K` BYTE - preenche um byte com um valor imediato na memória.
     * Operador:
-        * `[15:0]`=> imediato a ser carregado.
+        * `[15:0]`=> valor a ser preenchido.
 
 * `$` SPACE - reserva uma sequência de bytes nulos de memória.
     * Operador:
-        * `[15:0]`=> número de bytes nulos que devem ser reservados.
+        * `[15:0]`=> número de bytes nulos a serem reservados.
 
 * `#` END - indica ao montador o final físico do programa.
 
@@ -228,7 +228,7 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
     * Opções:
         * `-s` seleciona o tamanho em bytes de memória a ser descarregada. O valor é de 16 por padrão.
         * `-a` seleciona o endereço inicial de memória a ser descarregado. O valor é de 0x0 por padrão.
-        * `-b` seleciona o banco de memória que contém a região a ser descarregada. O valor é de 0x0 por padrão.
+        * `-b` seleciona o banco de memória a ser descarregado. O valor é de 0x0 por padrão.
         * `--hex` seleciona se o dumper acionado deve escrever a região de memória em imagem carregável (dumper absoluto) ou em tela (dumper hexadecimal).
 
 * `$ RUN` roda código em linguagem de máquina presente numa posição de memória.
@@ -236,7 +236,7 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
         `$ RUN [-a ADRESS] [-b BANK] [--step]`
     * Opções:
         * `-a` seleciona o endereço inicial de memória do código a ser rodado. O valor é de 0x0 por padrão.
-        * `-b` seleciona o banco de memória do código a ser rodado. O valor é de 0x0 por padrão.
+        * `-b` seleciona o banco de memória que contém o código a ser rodado. O valor é de 0x0 por padrão.
         * `--step` seleciona se o código deve ser rodado passo-a-passo. Por padrão, o código é rodado de uma vez.
 
 * `$ EXIT` sai do interpretador de comandos e finaliza o programa.
@@ -251,7 +251,7 @@ Para explicar o funcionamento da linguagem simbólica e da máquina virtual com 
 
 * `hello.asm`
 
-Primeiramente, será apresentado o programa mais simples de qualquer linguagem de programação, o "hello, world!"
+Primeiramente, será apresentado o programa mais simples de qualquer linguagem de programação, o "Hello, world!"
 
 Nesse programa, possuímos como objetivo a impressão ao usuário da frase "Hello, world!".
 
@@ -455,4 +455,4 @@ ACC => 095
 $
 ```
 
-Pela resposta da máquina, percebe-se que a soma foi defidamente executada, comprovando o correto funcionamento das chamadas de sub-rotina.
+Pela resposta da máquina, percebe-se que a soma foi defidamente executada e o resultado foi armazenado na memória, comprovando o correto funcionamento das chamadas de sub-rotina.
