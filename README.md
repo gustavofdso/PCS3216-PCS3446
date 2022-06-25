@@ -24,7 +24,7 @@ A máquina virtual projetada para a elaboração do projeto possui:
 
 #### Registradores
 
-* Program Counter (16 bits): armazena o endereço que está sendo executada.
+* Program Counter (16 bits): armazena o endereço da instrução que está sendo executada.
 
 * Link Register (16 bits): armazena o endereço de retorno numa entrada de sub-rotina.
 
@@ -38,19 +38,19 @@ A máquina virtual projetada para a elaboração do projeto possui:
 
 #### Programas de sistema
 
-* Loader: lê um arquivo contendo uma imagem carregável de código objeto em linguagem de máquina, e a na posição de memória correspondente.
+* Loader: lê um arquivo contendo uma imagem carregável de memória, e a armazena na posição correspondente.
 
-* Dumper: lê uma região de memória e gera um arquivo contendo uma imagem carregável de código objeto em linguagem de máquina, pronta pra ser carregada por um loader.
+* Dumper: lê uma região de memória e gera um arquivo contendo uma imagem carregável de memória, pronta para ser carregada por um loader.
 
-* Assembler: lê um arquivo contendo código fonte em linguagem mnemônica, e gera um arquivo contendo código objeto em linguagem de máquina, pronto pra ser carregado por um loader.
+* Assembler: lê um arquivo contendo código fonte em linguagem mnemônica, e gera um arquivo contendo código objeto em linguagem de máquina, pronto para ser carregado por um loader.
 
-* Linker: liga entry-points entre programas, armazenando endereços numa tabela de símbolos. Permite que programas possam chamar uns aos outros pela resolução de endereços externos.
+* Linker: liga entry-points entre programas, armazenando endereços numa tabela de símbolos. Permite que programas possam chamar uns aos outros através resolução de endereços externos.
 
 --------------------
 
 ### Linguagem mnemônica
 
-A máquina virtual é capaz de montar programas em linguagem simbólica. Para isso, foi definida uma linguagem a nível de montagem, com opcodes de 4 bits, instruções de 2 bytes e 16 instruções no total:
+A máquina virtual é capaz de montar programas em linguagem simbólica. Para isso, foi definida uma linguagem a nível de montagem, com 16 instruções no total, opcodes de 4 bits e instruções de 2 bytes.
 
 #### Instruções
 
@@ -130,6 +130,7 @@ A máquina virtual é capaz de montar programas em linguagem simbólica. Para is
 * `PD` PUT DATA - imprime na tela o dado do acumulador.
     * Estrutura:
         * `[15:12]` => opcode
+        * `[3:0]` => operando
 
     * Operando:
         * `0000` => Imprime o dado em formato decimal.
@@ -137,7 +138,7 @@ A máquina virtual é capaz de montar programas em linguagem simbólica. Para is
         * `0010` => Imprime o dado em formato hexadecimal.
         * `0011` => Imprime o dado em formato unicode.
 
-* `OS` OPERATING SYSTEM - imprime na tela o atual estado da máquina, ou encerra a execução do progama.
+* `OS` OPERATING SYSTEM - imprime na tela o estado atual da máquina, ou encerra a execução do progama.
     * Estrutura:
         * `[15:12]` => opcode
         * `[3:0]` => operando
@@ -148,46 +149,46 @@ A máquina virtual é capaz de montar programas em linguagem simbólica. Para is
 
 #### Pseudo-instruções
 
-* `<` EXT - indica que um label é um entry point externo ao programa ao ligador.
+* `<` EXT - indica ao ligador que um label é um entry point externo ao programa.
 
-* `>` ENT - indica que um label é um entry point interno ao programa ao ligador.
+* `>` ENT - indica ao ligador que um label é um entry point interno ao programa.
 
-* `@` ORG - indica o endereço absoluto de origem ao montador.
+* `@` ORG - indica ao montador o endereço absoluto de origem do código a seguir.
     * Operador:
-        * `[15:12]` => banco de memória do código seguinte.
-        * `[11:0]` => endereço inicial do código seguinte.
+        * `[15:12]` => banco de memória do código a seguir.
+        * `[11:0]` => endereço inicial do código a seguir.
 
-* `K` BYTE - reserva um byte de memória com um imediato.
+* `K` BYTE - preenche um byte com um valor imediato na memória.
     * Operador:
         * `[15:0]`=> imediato a ser carregado.
 
-* `$` SPACE - reserva um número de bytes nulos de memória.
+* `$` SPACE - reserva uma sequência de bytes nulos de memória.
     * Operador:
         * `[15:0]`=> número de bytes nulos que devem ser reservados.
 
-* `#` END - indica o final físico do código a ser montado.
+* `#` END - indica ao montador o final físico do programa.
 
 #### Sintaxe da linguagem
 
-Para a construção de programas e declaração de dados na linguagem simbólica, é possível utilizar qualquer editor de texto.
+Para a construção de programas e declaração de dados em linguagem simbólica, é possível utilizar qualquer editor de texto.
 
 Os códigos na linguagem mnemônica definida são compostos de:
 
-* Cabeçalho: são identificados os entry-points externos e internos do programa. Nesse trecho, devem ser utilizadas apenas pseudo-instruções dos tipos `<` e `>`. Essa parte é ignorada pelo montador, mas as suas informações são úteis para o ligador, que conecta trechos de código entre os programas já montados. Esse trecho é opcional.
+* Cabeçalho: onde são identificados os entry-points externos e internos do programa. Nesse trecho, devem ser utilizadas apenas pseudo-instruções dos tipos `<` e `>`. Essa parte é ignorada pelo montador, mas as suas informações são úteis para o ligador, que conecta trechos de código entre os programas já montados. Esse trecho é opcional.
 
-* Endereço de origem: é identificado o endereço de origem absoluto do programa. Nesse trecho, devem ser utilizadas apenas pseudo-instruções do tipo `@`.
+* Endereço de origem: onde é identificado o endereço de origem absoluto do programa. Nesse trecho, devem ser utilizadas apenas pseudo-instruções do tipo `@`.
 
-* Código: é feita a sequencialização das instruções ou declaração de dados. Nesse trecho, podem ser utilizadas quaisquer instruções ou pseudo-instruções que não são utilizados em outros trechos do código.
+* Código: onde é feita a sequencialização das instruções ou declaração de dados. Nesse trecho, podem ser utilizadas quaisquer instruções ou pseudo-instruções que não são utilizados em outros trechos do código.
 
-* Final físico: é identificado o final físico do programa. Nesse trecho, devem ser utilizadas apenas a pseudo-instrução do tipo `#`. Ao encontrar essa instrução, o montador insere uma chamada de sistema operacional (instrução do tipo `OS`), que causa a interrupção da execução de código.
+* Final físico: onde é identificado o final do programa. Nesse trecho, devem ser utilizadas apenas a pseudo-instrução do tipo `#`. Ao encontrar essa instrução, o montador insere uma chamada de sistema operacional (instrução do tipo `OS`) que causa a interrupção da execução de código.
 
 As instruções e pseudo-instruções são compostas de:
 
 * Label: opcional. Indica o nome de uma instrução, e pode ser referenciada em outros pontos do programa ou como entry-points.
 
-* Comando: obrigatório. Indica qual a instrução ou pseudo-instrução, e deve ser um dos mnemônicos listados acima. Linhas sem comandos serão ignoradas pelo montador e ligador.
+* Comando: obrigatório. Indica qual a instrução ou pseudo-instrução executada, e deve ser um dos mnemônicos listados acima. Linhas sem comandos serão ignoradas pelos programas de sistema.
 
-* Operador: opcional. Embora a maioria da instrução possua um operador, é possível deixá-lo em branco, e o montador irá utilizar o valor 0x0 por padrão.
+* Operador: opcional. Embora a maioria da instrução possua um operador, é possível deixá-lo em branco. Nesse caso, o montador irá utilizar o valor 0x0 por padrão.
 
 * Comentário: opcional. Qualquer texto que seja encontrado numa linha de código depois do caracter `;` é considerado um comentário, e será totalmente ignorado pelos programas de sistema.
 
@@ -201,7 +202,7 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
 
 #### Comandos disponíveis
 
-* `$ HELP` imprime uma descrição dos possíveis comandos.
+* `$ HELP` imprime uma descrição detalhada dos possíveis comandos.
     * Sintaxe:
         `$ HELP`
 
@@ -213,24 +214,24 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
     * Sintaxe:
         `$ STA`
 
-* `$ ASM` monta um arquivo com código em linguagem mnemônica, gerando um arquivo com código em linguagem de máquina pronto para ser carregado. Faz a ligação com entry-points externos e atualiza a tabela de entry-points do ligador.
+* `$ ASM` monta um arquivo com código em linguagem mnemônica, gerando um arquivo com código objeto em linguagem de máquina pronto para ser carregado. Faz também a ligação com entry-points externos e atualiza a tabela de entry-points do ligador.
     * Sintaxe:
         `$ ASM FILENAME`
 
-* `$ LOAD` carrega um arquivo com código em linguagem de máquina na memória.
+* `$ LOAD` carrega uma imagem carregável na memória.
     * Sintaxe:
         `$ LOAD FILENAME`
 
-* `$ DUMP` carrega um arquivo com código em linguagem de máquina na memória.
+* `$ DUMP` descarrega uma imagem carregável na memória, pronta pra ser carregada pelo loader.
     * Sintaxe:
         `$ DUMP FILENAME [-s SIZE] [-a ADRESS] [-b BANK] [--hex]`
     * Opções:
         * `-s` seleciona o tamanho em bytes de memória a ser descarregada. O valor é de 16 por padrão.
         * `-a` seleciona o endereço inicial de memória a ser descarregado. O valor é de 0x0 por padrão.
-        * `-b` seleciona o banco de memória a ser descarregado. O valor é de 0x0 por padrão.
-        * `--hex` seleciona se a memória deve ser emitido num arquivo ou impresso na tela. Por padrão, a memória é emitida num arquivo.
+        * `-b` seleciona o banco de memória que contém a região a ser descarregada. O valor é de 0x0 por padrão.
+        * `--hex` seleciona se o dumper acionado deve escrever a região de memória em imagem carregável (dumper absoluto) ou em tela (dumper hexadecimal).
 
-* `$ RUN` roda código binário numa posição de memória.
+* `$ RUN` roda código em linguagem de máquina numa posição de memória.
     * Sintaxe:
         `$ RUN [-a ADRESS] [-b BANK] [--step]`
     * Opções:
@@ -246,7 +247,7 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
 
 ### Exemplos de código e utilização da máquina
 
-Para explicar o funcionamento da linguagem simbólica e da máquina virtual com mais detalhes, serão apresentados códigos exemplo, construídos na linguagem de montagem definida.
+Para explicar o funcionamento da linguagem simbólica e da máquina virtual com mais detalhes, serão apresentados códigos exemplo, construídos na linguagem de montagem definida anteriormente.
 
 * `hello.asm`
 
@@ -254,7 +255,7 @@ Primeiramente, será apresentado o programa mais simples de qualquer linguagem d
 
 Nesse programa, possuímos como objetivo a impressão ao usuário da frase "Hello, world!".
 
-É adicionado o endereço de origem do código. É adicionada também uma instrução de `JP`, para indicar que o código deve ser iniciado na label `START`.
+Como esse programa não se utilizado de endereços externos, não é necessária a adição do cabeçalho. O programa, então, é iniciado com o endereço de origem do código. É adicionada também uma instrução de `JP`, para indicar que o código deve ser iniciado na label `START`.
 
 ```
 ; Hello
@@ -265,7 +266,7 @@ Nesse programa, possuímos como objetivo a impressão ao usuário da frase "Hell
             JP      START           ; iniciando a execução do programa
 ```
 
-São declarados os dados da string em bytes, em seu formato unicode. O zero demarca o fim da string.
+São declarados os dados da string em bytes em formato unicode. O zero demarca o fim da string.
 
 ```
 STRING      K       =72             ; declaração da string, em formato unicode
@@ -284,7 +285,7 @@ STRING      K       =72             ; declaração da string, em formato unicode
             K       =0
 ```
 
-Em seguida, é feito um loop na string, utilizado a instrução `PD` para imprimir os dados na tela em formato unicode. Quando o acumulador é zero, o programa desvia para o final do programa, na label `END`
+Em seguida, é feito um loop na string, utilizando a instrução `PD` para imprimir os dados na tela. Quando o valor presente no acumulador é nulo, o programa entende que foi alcançado o fim da string e desvia para o final do programa, na label `END`
 
 ```
 ONE         K       =1
@@ -306,7 +307,7 @@ END         LV      =2              ; voltando ao estado original
             #                       ; fim do programa
 ```
 
-Para executar esse programa, basta seguir a seguinte interação com a máquina virtual:
+Para executar esse programa na máquina virtual, basta seguir a seguinte sequência de comandos:
 
 ```
 Enter a command! Type HELP to see possible commands.
@@ -329,7 +330,7 @@ ACC => !
 $
 ```
 
-O comando `ASM` gerou o arquivo `hello.obj`, uma imagem carregável de memória dentro da pasta de códigos objetos executáveis. O comando `LOAD` fez a carga do conteúdo desse arquivo binário na memória da máquina, e o comando `RUN` fez a interpretação e execução das instruções binárias dentro da máquina. Com os comandos acima rodados, para um exemplo de utilização do dumper, pode-se usar:
+O comando `ASM` serve para montar o programa em linguagem simbólica e gerar o arquivo `hello.obj`, uma imagem carregável de memória dentro da pasta de códigos objetos executáveis. O comando `LOAD` faz a carga do conteúdo dessa imagem na memória da máquina, e o comando `RUN` faz a interpretação e execução das instruções binárias presentes na memória da máquina. Com os comandos acima executados, para um exemplo de utilização do dumper hexadecimal, pode-se usar:
 
 ```
 $ DUMP -a 0 -b 0 --hex 
@@ -361,7 +362,7 @@ Pode-se também utilizar o dumper absoluto:
 DUMP hellodump -a 0 -b 0
 ```
 
-Esse comando gerou o arquivo binário `hellodump.obj`. Como esperado, os dois primeiros bytes desse arquivo são indicadores do banco e endereço que o código deve começar a ser armazenado na memória. Podemos visualizar o arquivo:
+Esse comando gera a imagem carregável `hellodump.obj`. Como esperado, os dois primeiros bytes desse arquivo são indicadores do banco e endereço que o código deve começar a ser armazenado na memória. Podemos visualizar o arquivo:
 
 ```
 0000000000000000
@@ -383,19 +384,19 @@ Esse comando gerou o arquivo binário `hellodump.obj`. Como esperado, os dois pr
 00000000
 ```
 
-Esse arquivo contém uma imagem carregável de memória, pronta para ser carregada por um loader. Para o teste dessa interação, pode ser rodada:
+Esse arquivo contém código objeto em linguagem de máquina, pronta para ser carregada por um loader. Para o teste dessa interação, pode ser rodada:
 
 ```
 LOAD hellodump
 ```
 
-Nenhum erro é exibido, e o código foi carregado na memória da máquina na mesma região que foi anteriormente decarregada. Uma vez que o código que foi carregado é o mesmo que foi descarregado e suas posições alvo de memória são idênticas, não há mudanças perceptíveis no estado e memória da máquina.
+Nenhum erro será exibido, e o código será carregado na memória da máquina na mesma região que foi anteriormente decarregada. Uma vez que o código carregado é o mesmo que foi descarregado e suas posições alvo de memória são idênticas, não há mudanças perceptíveis no estado dos registradores e memória da máquina.
 
 * `somador.asm` e `soma.asm`
 
-Agora, será apresentado um exemplo mais complexo, que faz o uso do ligador para executar código em arquivos separados.
+Agora, será apresentado um exemplo mais complexo, que faz o uso do ligador para executar códigos em arquivos separados.
 
-A sub-rotina `SOMADOR` faz o uso de entry-points para realiza a soma de dois valores armazenados na memória. Ao final da sub-rotina, a instrução `RS` é utilizada para retornar o program counter para o fluxo principal, visto que esse registrador foi salvo no link register.
+A sub-rotina `SOMADOR` faz o uso de entry-points para realizar a soma de dois valores armazenados na memória. Ao final da sub-rotina, a instrução `RS` é utilizada para retornar o program counter para o fluxo principal, visto que esse registrador foi salvo no link register.
 
 ```
 ; Somador
@@ -415,7 +416,7 @@ SOMADOR     LD      ENTRADA1        ; realizando a soma
             RS                      ; retornando da sub-rotina
 ```
 
-O programa `SOMA` testa a chamada do somador, visto que os entry-points externos utilizados na sub-rotina têm de ser resolvidos pelo ligador. As variáveis são passadas na memória, e logo a sub-rotina é chamada.
+O programa `SOMA` testa a chamada do `SOMADOR`, visto que os entry-points externos utilizados na sub-rotina são resolvidos pelo ligador. As variáveis são primeiramente passadas na memória, e logo a sub-rotina é chamada.
 
 ```
 ; Soma
@@ -441,7 +442,7 @@ INICIO      LD      VALOR1          ; passando as variáveis na memória
             #                       ; fim do programa
 ```
 
-Para executar esse programa, basta seguir a seguinte interação com a máquina virtual:
+Para executar esse programa na máquina virtual, basta seguir a seguinte sequência de comandos:
 
 ```
 Enter a command! Type HELP to see possible commands.
@@ -453,3 +454,5 @@ $ RUN -a 0 -b 0
 ACC => 095
 $
 ```
+
+Pela resposta da máquina, percebe-se que a soma foi defidamente executada, comprovando o correto funcionamento das chamadas de sub-rotina.
