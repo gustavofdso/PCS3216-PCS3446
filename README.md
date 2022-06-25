@@ -26,9 +26,9 @@ A máquina virtual projetada para a elaboração do projeto possui:
 
 * Program Counter (16 bits): armazena o endereço da instrução que está sendo executada.
 
-* Link Register (16 bits): armazena o endereço de retorno numa entrada de sub-rotina.
+* Link Register (16 bits): armazena o endereço de retorno em entradas de sub-rotina.
 
-* Instruction Register (16 bits): armazena o código binário atual.
+* Instruction Register (16 bits): armazena o código binário da instrução atual a ser executada.
 
 * Accumulator (8 bits): registrador de propósito geral, à disposição do programador.
 
@@ -38,9 +38,9 @@ A máquina virtual projetada para a elaboração do projeto possui:
 
 #### Programas de sistema
 
-* Loader: lê um arquivo contendo uma imagem carregável de memória, e a armazena na posição correspondente.
+* Loader: lê um arquivo contendo uma imagem carregável, e a armazena na posição de memória correspondente.
 
-* Dumper: lê uma região de memória e gera um arquivo contendo uma imagem carregável de memória, pronta para ser carregada por um loader.
+* Dumper: lê uma região de memória e gera um arquivo contendo uma imagem carregável, pronta para ser carregada por um loader.
 
 * Assembler: lê um arquivo contendo código fonte em linguagem mnemônica, e gera um arquivo contendo código objeto em linguagem de máquina, pronto para ser carregado por um loader.
 
@@ -170,7 +170,7 @@ A máquina virtual é capaz de montar programas em linguagem simbólica. Para is
 
 #### Sintaxe da linguagem
 
-Para a construção de programas e declaração de dados em linguagem simbólica, é possível utilizar qualquer editor de texto.
+Para a construção de programas e declaração de dados em linguagem simbólica, é possível utilizar qualquer editor de texto. Para isso, é suficiente salvar o arquivo `.asm` contendo o código fonte em linguagem mnemônica no diretório `.\source\`.
 
 Os códigos na linguagem mnemônica definida são compostos de:
 
@@ -206,7 +206,7 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
     * Sintaxe:
         `$ HELP`
 
-* `$ DIR` imprime os nomes dos arquivos disponíveis para ASM e LOAD.
+* `$ DIR` imprime os nomes dos arquivos disponíveis para `ASM` e `LOAD`.
     * Sintaxe:
         `$ DIR`
 
@@ -214,15 +214,15 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
     * Sintaxe:
         `$ STA`
 
-* `$ ASM` monta um arquivo com código em linguagem mnemônica, gerando um arquivo com código objeto em linguagem de máquina pronto para ser carregado. Faz também a ligação com entry-points externos e atualiza a tabela de entry-points do ligador.
+* `$ ASM` monta um arquivo com código em linguagem mnemônica, gerando um arquivo com código objeto em linguagem de máquina pronto para ser carregado. Faz também a ligação com entry-points externos e atualiza a tabela de endereços do ligador.
     * Sintaxe:
         `$ ASM FILENAME`
 
-* `$ LOAD` carrega uma imagem carregável na memória.
+* `$ LOAD` carrega uma imagem carregável de memória.
     * Sintaxe:
         `$ LOAD FILENAME`
 
-* `$ DUMP` descarrega uma imagem carregável na memória, pronta pra ser carregada pelo loader.
+* `$ DUMP` descarrega uma imagem carregável de memória, pronta pra ser carregada pelo loader.
     * Sintaxe:
         `$ DUMP FILENAME [-s SIZE] [-a ADRESS] [-b BANK] [--hex]`
     * Opções:
@@ -231,7 +231,7 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
         * `-b` seleciona o banco de memória que contém a região a ser descarregada. O valor é de 0x0 por padrão.
         * `--hex` seleciona se o dumper acionado deve escrever a região de memória em imagem carregável (dumper absoluto) ou em tela (dumper hexadecimal).
 
-* `$ RUN` roda código em linguagem de máquina numa posição de memória.
+* `$ RUN` roda código em linguagem de máquina presente numa posição de memória.
     * Sintaxe:
         `$ RUN [-a ADRESS] [-b BANK] [--step]`
     * Opções:
@@ -362,7 +362,7 @@ Pode-se também utilizar o dumper absoluto:
 DUMP hellodump -a 0 -b 0
 ```
 
-Esse comando gera a imagem carregável `hellodump.obj`. Como esperado, os dois primeiros bytes desse arquivo são indicadores do banco e endereço que o código deve começar a ser armazenado na memória. Podemos visualizar o arquivo:
+Esse comando gera a imagem carregável `hellodump.obj` no diretório `.\obj\`. Como esperado, os dois primeiros bytes desse arquivo são indicadores do banco e endereço que o código deve começar a ser armazenado na memória. Podemos visualizar o arquivo:
 
 ```
 0000000000000000
