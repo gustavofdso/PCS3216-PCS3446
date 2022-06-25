@@ -24,13 +24,13 @@ A máquina virtual projetada para a elaboração do projeto possui:
 
 #### Registradores
 
-* Program Counter       (16 bits): armazena o endereço que está sendo executada.
+* Program Counter (16 bits): armazena o endereço que está sendo executada.
 
-* Link Register         (16 bits): armazena o endereço de retorno numa entrada de sub-rotina.
+* Link Register (16 bits): armazena o endereço de retorno numa entrada de sub-rotina.
 
-* Instruction Register  (16 bits): armazena o código binário atual.
+* Instruction Register (16 bits): armazena o código binário atual.
 
-* Accumulator            (8 bits): registrador de propósito geral, à disposição do programador.
+* Accumulator (8 bits): registrador de propósito geral, à disposição do programador.
 
 #### Memória
 
@@ -38,9 +38,9 @@ A máquina virtual projetada para a elaboração do projeto possui:
 
 #### Programas de sistema
 
-* Loader: lê um arquivo contendo código objeto em linguagem de máquina, e armazena esse código na posição de memória correspondente.
+* Loader: lê um arquivo contendo uma imagem carregável de código objeto em linguagem de máquina, e a na posição de memória correspondente.
 
-* Dumper: lê uma região de memória e gera um arquivo contendo código objeto em linguagem de máquina, pronto pra ser carregado por um loader.
+* Dumper: lê uma região de memória e gera um arquivo contendo uma imagem carregável de código objeto em linguagem de máquina, pronta pra ser carregada por um loader.
 
 * Assembler: lê um arquivo contendo código fonte em linguagem mnemônica, e gera um arquivo contendo código objeto em linguagem de máquina, pronto pra ser carregado por um loader.
 
@@ -248,7 +248,7 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
 
 Para explicar o funcionamento da linguagem simbólica e da máquina virtual com mais detalhes, serão apresentados códigos exemplo, construídos na linguagem de montagem definida.
 
-* hello.asm
+* `hello.asm`
 
 Primeiramente, será apresentado o programa mais simples de qualquer linguagem de programação, o "hello, world!"
 
@@ -329,7 +329,69 @@ ACC => !
 $
 ```
 
-* somador.asm e soma.asm
+O comando `ASM` gerou o arquivo `hello.obj`, uma imagem carregável de memória dentro da pasta de códigos objetos executáveis. O comando `LOAD` fez a carga do conteúdo desse arquivo binário na memória da máquina, e o comando `RUN` fez a interpretação e execução das instruções binárias dentro da máquina. Com os comandos acima rodados, para um exemplo de utilização do dumper, pode-se usar:
+
+```
+$ DUMP -a 0 -b 0 --hex 
+Memory bank: 00
+000 => 00
+001 => 13
+002 => 48
+003 => 65
+004 => 6C
+005 => 6C
+006 => 6F
+007 => 2C
+008 => 20
+009 => 77
+00A => 6F
+00B => 72
+00C => 6C
+00D => 64
+00E => 21
+00F => 00
+$
+```
+
+Pela resposta da máquina, percebe-se que o dumper hexadecimal exibe na tela os conteúdos das posições de memória que foram carregadas pelo loader.
+
+Pode-se também utilizar o dumper absoluto:
+
+```
+DUMP hellodump -a 0 -b 0
+```
+
+Esse comando gerou o arquivo binário `hellodump.obj`. Como esperado, os dois primeiros bytes desse arquivo são indicadores do banco e endereço que o código deve começar a ser armazenado na memória. Podemos visualizar o arquivo:
+
+```
+0000000000000000
+00000000
+00010011
+01001000
+01100101
+01101100
+01101100
+01101111
+00101100
+00100000
+01110111
+01101111
+01110010
+01101100
+01100100
+00100001
+00000000
+```
+
+Esse arquivo contém uma imagem carregável de memória, pronta para ser carregada por um loader. Para o teste dessa interação, pode ser rodada:
+
+```
+LOAD hellodump
+```
+
+Nenhum erro é exibido, e o código foi carregado na memória da máquina na mesma região que foi anteriormente decarregada. Uma vez que o código que foi carregado é o mesmo que foi descarregado e suas posições alvo de memória são idênticas, não há mudanças perceptíveis no estado e memória da máquina.
+
+* `somador.asm` e `soma.asm`
 
 Agora, será apresentado um exemplo mais complexo, que faz o uso do ligador para executar código em arquivos separados.
 
