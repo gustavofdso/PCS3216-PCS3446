@@ -106,7 +106,7 @@ def _operating_system(self):
 
     # Print current state
     if operand == 0b0000:
-        print('OS Call! Machine status:')
+        print('OS Call!')
         self.show_status()
 
     # Finish execution

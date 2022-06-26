@@ -1,6 +1,5 @@
 import argparse
 import pandas as pd
-import os
 from ctypes import c_uint8, c_uint16, c_int8
 
 class VirtualMachine:
@@ -50,59 +49,17 @@ class VirtualMachine:
     )
 
     # Defining machine system programs
-    from src.assemble import assemble
     from src.load import load
     from src.dump import dump, hex_dump
+    from src.assemble import assemble
 
-    # Get adress for memory acess
-    def get_target_adress(self, adress):
-        if self.indirect_mode:
-            adress = self.memory[self.current_bank.value][adress].value << 8 | self.memory[self.current_bank.value][adress + 1].value
-            adress &= 0x0FFF
-        self.indirect_mode = False
-        return adress
+    # Defining machine utils
+    from src.utils import get_target_adress, process_operator, show_status, show_files
 
-    # Defining string to number conversion
-    def process_operator(self, number):
-        if number[0] == '=': number = int(number[1:], 10)
-        elif number[0] == '#': number = int(number[1:], 2)
-        elif number[0] == '/': number = int(number[1:], 16)
-        else:
-            try: number = int(number, 10)
-            except Exception: pass
-        return number
+    # Defining machine execution algorithm
+    from src.execute import fetch_instruction, execute_instruction, run_code
 
-    def show_status(self):
-        print('\tACC => {0:03d}, 0b{0:08b}, 0x{0:04X}'.format(self.accumulator.value))
-        print('\tPC  => 0x{:04X}'.format(self.program_counter.value))
-        print('\tRI  => 0x{:04X}'.format(self.instruction_register.value))
-        print('\tLR  => 0x{:04X}'.format(self.link_register.value))
-
-    # Defining execution algorithm 
-    def fetch_instruction(self):
-        # Fetching instruction and updating program counter
-        self.instruction_register.value = self.memory[self.current_bank.value][self.program_counter.value].value << 8 | self.memory[self.current_bank.value][self.program_counter.value + 1].value
-        self.program_counter.value += 2
-
-    def execute_instruction(self):
-        # Getting opcode and executing instruction
-        opcode = (self.instruction_register.value & 0xF000) >> 12
-        self.mnemonic_table.set_index('opcode').at[opcode, 'instruction']()
-
-    def run_code(self, start_adress, bank, step = False):
-        self.program_counter.value = self.process_operator(start_adress)
-        self.current_bank.value = self.process_operator(bank)
-
-        # Running sequential instructions
-        self.running = True
-        while self.running:
-            self.fetch_instruction()
-            self.execute_instruction()
-            if step:
-                input()
-                print('Step! Machine status:')
-                self.show_status()
-
+    # Defining command interpreter
     def run(self):
         print('Enter a command! Type HELP to see possible commands.')
         while True:
@@ -111,6 +68,7 @@ class VirtualMachine:
             command = msg[0].upper()
             parser = argparse.ArgumentParser()
             try:
+                # HELP command
                 if command == 'HELP':
                     print(
 """
@@ -144,33 +102,27 @@ class VirtualMachine:
 """
                     )
 
+                # DIR command
                 if command == 'DIR':
-                    # Showing ASM files
-                    path_source = './source/'
-                    print('Available files for ASM:')
-                    for filename in os.listdir(path_source):
-                        if '.asm' in filename.lower(): print('\t' + filename.lower().replace('.asm', ''))
-                    
-                    # Showing OBJ files
-                    path_object = './object/'
-                    print('\nAvailable files for LOAD:')
-                    for filename in os.listdir(path_object):
-                        if '.obj' in filename.lower(): print('\t' + filename.lower().replace('.obj', ''))
+                    self.show_files()
 
+                # STA command
                 elif command == 'STA':
-                    print('Machine status:')
                     self.show_status()
 
+                # ASM command
                 elif command == 'ASM':
                     kwargs, args = parser.parse_known_args(msg)
                     kwargs = vars(kwargs)
                     self.assemble(args[1])
 
+                # LOAD command
                 elif command == 'LOAD':
                     kwargs, args = parser.parse_known_args(msg)
                     kwargs = vars(kwargs)
                     self.load(args[1])
 
+                # DUMP command
                 elif command == 'DUMP':
                     parser.add_argument('-s', default = '16', type = str)
                     parser.add_argument('-a', default = '0', type = str)
@@ -181,6 +133,7 @@ class VirtualMachine:
                     if kwargs['hex']: self.hex_dump(kwargs['s'], kwargs['a'], kwargs['b'])
                     else: self.dump(args[1], kwargs['s'],  kwargs['a'], kwargs['b'])
 
+                # RUN command
                 elif command == 'RUN':
                     parser.add_argument('-a', default = '0', type = str)
                     parser.add_argument('-b', default = '0', type = str)
@@ -189,6 +142,7 @@ class VirtualMachine:
                     kwargs = vars(kwargs)
                     self.run_code(kwargs['a'], kwargs['b'], step = kwargs['step'])
 
+                # EXIT command
                 elif command == 'EXIT':
                     print('Exiting command interpreter!')
                     break
@@ -197,4 +151,4 @@ class VirtualMachine:
                     print("Invalid command! Type HELP to see possible commands.")
             
             except IndexError: print("Incorrect usage for this command! Type HELP to see possible commands.")
-            except Exception as e: print(e.__class__.__name__ + ': ' + str(e) + "\n\nType HELP to see possible commands.")
+            except Exception as e: print(e.__class__.__name__ + ': ' + str(e) + "\nType HELP to see possible commands.")

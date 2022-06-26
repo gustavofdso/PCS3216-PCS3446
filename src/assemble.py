@@ -2,6 +2,7 @@ import pandas as pd
 
 class AssemblyError(Exception): pass
 
+# Absolute assembler
 def assemble(self, filename):
     # Opening the file and reading lines
     with open('./source/' + filename + '.asm', 'r') as f:
@@ -32,14 +33,14 @@ def assemble(self, filename):
 
         lines.loc[lines.shape[0]] = [label, command, operator]
 
+    # Ignoring lines with no command and filling operators with zero
     lines.dropna(subset = 'command', inplace = True)
     lines['operator'].fillna(0, inplace = True)
 
-    # Getting bank and memory adress for the code
+    # Getting bank and memory adress
     adress_lines = lines[lines['command'] == '@']['operator'].to_list()
     if len(adress_lines) == 0: raise AssemblyError('Program must have an start adress (missing @).')
-    elif len(adress_lines) >= 2: raise AssemblyError('Multiple start adress defined.')
-
+    elif len(adress_lines) >= 2: raise AssemblyError('Program must have only one start adress (multiple @).')
     adress_line = adress_lines[0]
     bank = (adress_line & 0xF000) >> 12
     start_adress = adress_line & 0x0FFF
@@ -97,7 +98,11 @@ def assemble(self, filename):
         labels.loc[labels.shape[0]] = [label, label_adress]
 
     # Second assembly step - assembling instructions
+
+    # Dumping bank and memory adress
     obj_code = '{:04b}'.format(bank) + '{:012b}'.format(start_adress) + '\n'
+
+    # Filling the assembled lines
     for i in lines.index:
         label, command, operator = lines.at[i, 'label'], lines.at[i, 'command'], lines.at[i, 'operator']
         if operator in labels['label'].to_list(): operator = labels.set_index('label').at[operator, 'adress']
@@ -135,12 +140,13 @@ def assemble(self, filename):
         # Regular instruction
         elif command in self.mnemonic_table['mnemonic'].to_list():
             opcode = self.mnemonic_table.set_index('mnemonic').at[command, 'opcode']
-            operator &= 0xFFF
+            operator &= 0x0FFF
             obj_code +='{:04b}'.format(opcode) + '{:012b}'.format(operator) + '\n'
 
         # If not valid instruction, assembly error
         else: raise AssemblyError('Bad instruction: ' + command)
 
+    # Updating external adresses table
     self.linker_labels.dropna(inplace = True)
     self.linker_labels.drop_duplicates('label', inplace = True, keep = 'last')
 

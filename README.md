@@ -20,7 +20,7 @@ Alunos:
 
 ### Especificações da máquina virtual
 
-A máquina virtual projetada para a elaboração do projeto possui:
+A máquina virtual projetada para o projeto possui:
 
 #### Registradores
 
@@ -34,7 +34,7 @@ A máquina virtual projetada para a elaboração do projeto possui:
 
 #### Memória
 
-* 16 bancos (0x0 até 0xF) de memória, de 4096 (0x000 até 0xFFF) bytes cada.
+* 16 bancos (identificados de 0x0 até 0xF) de memória, com 4096 bytes (endereços de 0x000 até 0xFFF) cada.
 
 #### Programas de sistema
 
@@ -192,7 +192,7 @@ As instruções e pseudo-instruções são compostas de:
 
 * Comentário: opcional. Qualquer texto que seja encontrado numa linha de código depois do caracter `;` é considerado um comentário, e será totalmente ignorado pelos programas de sistema.
 
-Ao final desse documento, serão apresentados exemplos de código e sua utilização.
+Ao final desse documento, serão apresentados exemplos de código e utilização da máquina.
 
 --------------------
 
@@ -384,7 +384,7 @@ Esse comando gera a imagem carregável `hellodump.obj` no diretório `.\obj\`. C
 00000000
 ```
 
-Esse arquivo contém código objeto em linguagem de máquina, pronta para ser carregada por um loader. Para o teste dessa interação, pode ser rodada:
+Esse arquivo contém código objeto em linguagem de máquina, pronta para ser carregada por um loader. Para o teste dessa interação, pode ser rodado:
 
 ```
 LOAD hellodump
