@@ -285,7 +285,7 @@ STRING      K       =72             ; declaração da string, em formato unicode
             K       =0
 ```
 
-Em seguida, é feito um loop na string, utilizando a instrução `PD` para imprimir os dados na tela. Quando o valor presente no acumulador é nulo, o programa entende que foi alcançado o fim da string e desvia para o final do programa, na label `END`
+Em seguida, é feito um loop na string, utilizando a instrução `PD` para imprimir os dados na tela. Quando o valor presente no acumulador é nulo, o programa entende que foi alcançado o fim da string e desvia para o final do programa, na label `END`.
 
 ```
 ONE         K       =1
