@@ -455,4 +455,4 @@ ACC => 095
 $
 ```
 
-Pela resposta da máquina, percebe-se que a soma foi defidamente executada e o resultado foi armazenado na memória, comprovando o correto funcionamento das chamadas de sub-rotina.
+Pela resposta da máquina, percebe-se que a soma foi defidamente executada e o resultado foi armazenado no acumulador. Assim, comprova-se o correto funcionamento das chamadas de sub-rotina.
