@@ -6,7 +6,7 @@ Escola Politécnica da USP
 Projeto de um simulador de um sistema de programação simples, funcional e completo.
 
 Alunos:
-* Alessandro Jiã Iong Li - 10291791        
+* Alessandro Jiã Iong Li - 10291791
 * Gustavo Freitas de Sá Oliveira - 11261062
 * Roberta Boaventura Andrade - 11260832
 
