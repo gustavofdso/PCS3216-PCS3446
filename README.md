@@ -247,7 +247,11 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
 
 ### Exemplos de código e utilização da máquina
 
-Para rodar a máquina virtual, é necessário um interpretador de Python 3.8.13, visto que os programas de sistema e simulador da máquina virtual foram construídos nessa linguagem. São necessárias também algumas bibliotecas, sendo elas: `os`, `argparse 1.1`, `pandas 1.4.2` e `ctypes 1.1.0`. Com isso, basta executar o programa `main.py`, disponível no diretório principal.
+Para rodar a máquina virtual, é necessário um interpretador de Python 3.8.13, visto que os programas de sistema e simulador da máquina virtual foram construídos nessa linguagem. São necessárias também algumas bibliotecas, sendo elas: `os`, `argparse 1.1`, `pandas 1.4.2` e `ctypes 1.1.0`. A execução do programa pode ser feita com o seguinte comando:
+
+```
+python main.py
+```
 
 Para explicar o funcionamento da linguagem simbólica e da máquina virtual com mais detalhes, serão apresentados códigos exemplo, construídos na linguagem de montagem definida anteriormente.
 
