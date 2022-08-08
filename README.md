@@ -138,7 +138,7 @@ A máquina virtual é capaz de montar programas em linguagem simbólica. Para is
         * `0010` => Imprime o dado em formato hexadecimal.
         * `0011` => Imprime o dado em formato unicode.
 
-* `OS` OPERATING SYSTEM - imprime na tela o estado atual da máquina, ou encerra a execução do progama.
+* `OS` OPERATING SYSTEM - imprime na tela o estado atual da máquina, ou encerra a execução do programa.
     * Estrutura:
         * `[15:12]` => opcode
         * `[3:0]` => operando
@@ -178,7 +178,7 @@ Os códigos na linguagem mnemônica definida são compostos de:
 
 * Endereço de origem: onde é identificado o endereço de origem absoluto do programa. Nesse trecho, devem ser utilizadas apenas pseudo-instruções do tipo `@`.
 
-* Código: onde é feita a sequencialização das instruções ou declaração de dados. Nesse trecho, podem ser utilizadas quaisquer instruções ou pseudo-instruções que não são utilizados em outros trechos do código.
+* Código: onde é feita a sequencialização das instruções ou declaração de dados. Nesse trecho, podem ser utilizadas quaisquer instruções ou pseudo-instruções que não são utilizadas em outros trechos do código.
 
 * Final físico: onde é identificado o final do programa. Nesse trecho, devem ser utilizadas apenas a pseudo-instrução do tipo `#`. Ao encontrar essa instrução, o montador insere uma chamada de sistema operacional (instrução do tipo `OS`) que causa a interrupção da execução de código.
 
@@ -190,7 +190,7 @@ As instruções e pseudo-instruções são compostas de:
 
 * Operador: opcional. Embora a maioria da instrução possua um operador, é possível deixá-lo em branco. Nesse caso, o montador irá utilizar o valor 0x0 por padrão.
 
-* Comentário: opcional. Qualquer texto que seja encontrado numa linha de código depois do caracter `;` é considerado um comentário, e será totalmente ignorado pelos programas de sistema.
+* Comentário: opcional. Qualquer texto que seja encontrado numa linha de código depois do caractere `;` é considerado um comentário, e será totalmente ignorado pelos programas de sistema.
 
 Ao final desse documento, serão apresentados exemplos de código e utilização da máquina.
 
@@ -300,7 +300,7 @@ CURR        K       =2              ; endereço de acesso atual
 
 START       LV      =0
             HM      /01             ; ligando o modo de endereçamento indireto
-            LD      ADDR            ; carregando o caracter atual
+            LD      ADDR            ; carregando o caractere atual
             JZ      END             ; se zero, ir para END
             PD      =3              ; imprimir dado em formato unicode
             LD      CURR            ; incrementando CURR
@@ -390,13 +390,13 @@ Esse comando gera a imagem carregável `hellodump.obj` no diretório `.\obj\`. C
 00000000
 ```
 
-Esse arquivo contém código objeto em linguagem de máquina, pronta para ser carregada por um loader. Para o teste dessa interação, pode ser rodado:
+Esse arquivo contém código objeto em linguagem de máquina, pronto para ser carregado por um loader. Para o teste dessa interação, pode ser rodado:
 
 ```
 LOAD hellodump
 ```
 
-Nenhum erro será exibido, e o código será carregado na memória da máquina na mesma região que foi anteriormente decarregada. Uma vez que o código carregado é o mesmo que foi descarregado e suas posições alvo de memória são idênticas, não há mudanças perceptíveis no estado dos registradores e memória da máquina.
+Nenhum erro será exibido, e o código será carregado na memória da máquina na mesma região que foi anteriormente descarregada. Uma vez que o código carregado é o mesmo que foi descarregado e suas posições alvo de memória são idênticas, não há mudanças perceptíveis no estado dos registradores e memória da máquina.
 
 * `somador.asm` e `soma.asm`
 
@@ -461,4 +461,4 @@ ACC => 095
 $
 ```
 
-Pela resposta da máquina, percebe-se que a soma foi defidamente executada e o resultado foi armazenado no acumulador. Assim, comprova-se o correto funcionamento das chamadas de sub-rotina.
+Pela resposta da máquina, percebe-se que a soma foi devidamente executada e o resultado foi armazenado no acumulador. Assim, comprova-se o correto funcionamento das chamadas de sub-rotina.
