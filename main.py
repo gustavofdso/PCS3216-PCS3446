@@ -1,4 +1,4 @@
-from src.VirtualMachine import VirtualMachine
+from src.virtualmachine import VirtualMachine
 
 # Calling VirtualMachine and starting command interpreter
 virtualmachine = VirtualMachine()

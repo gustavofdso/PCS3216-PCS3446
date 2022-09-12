@@ -1,9 +1,9 @@
-# PCS3216
-Sistemas de Programação (2022)
+# PCS3216 e PCS3446
+Sistemas de Programação e Sistemas Operacionais (2022)
 
 Escola Politécnica da USP
 
-Projeto de um simulador de um sistema de programação simples, funcional e completo.
+Projeto de um simulador de um sistema operacional simples, funcional e completo.
 
 Alunos:
 * Alessandro Jiã Iong Li - 10291791
@@ -14,7 +14,10 @@ Alunos:
 
 ### Documentos relevantes
 
-* Enunciado do projeto: https://edisciplinas.usp.br/pluginfile.php/7059383/mod_resource/content/1/PCS%203216%20-%20Projeto%202022.pdf
+#### Enunciados do projeto
+
+* `https://edisciplinas.usp.br/pluginfile.php/7059383/mod_resource/content/1/PCS%203216%20-%20Projeto%202022.pdf`
+* `https://edisciplinas.usp.br/pluginfile.php/7307187/mod_resource/content/1/Projeto%202022.pdf`
 
 --------------------
 
