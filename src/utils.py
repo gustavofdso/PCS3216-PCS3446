@@ -32,10 +32,23 @@ def show_files(self):
     path_source = './source/'
     print('Available files for ASM:')
     for filename in os.listdir(path_source):
-        if '.asm' in filename.lower(): print('\t' + filename.lower().replace('.asm', ''))
+        if '.s' in filename.lower(): print('\t' + filename.lower().replace('.s', ''))
     
     # Showing OBJ files
     path_object = './object/'
     print('\nAvailable files for LOAD:')
     for filename in os.listdir(path_object):
-        if '.obj' in filename.lower(): print('\t' + filename.lower().replace('.obj', ''))
+        if '.o' in filename.lower(): print('\t' + filename.lower().replace('.o', ''))
+
+# Showing current loaded programs
+def show_programs(self):
+    if self.programs.empty:
+        print('No loaded programs!')
+        return
+
+    for index, row in self.programs.iterrows():
+        print('\tName:', row['name'])
+        print('\tBank:', '0x{:01X}'.format(row['bank']))
+        print('\tStart Adress:', '0x{:03X}'.format(row['start_adress']))
+        print('\tEnd Adress:', '0x{:03X}'.format(row['end_adress']))
+        print('\n')

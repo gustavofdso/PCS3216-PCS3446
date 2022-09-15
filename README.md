@@ -173,7 +173,7 @@ A máquina virtual é capaz de montar programas em linguagem simbólica. Para is
 
 #### Sintaxe da linguagem
 
-Para a construção de programas e declaração de dados em linguagem simbólica, é possível utilizar qualquer editor de texto. Para isso, é suficiente salvar o arquivo `.asm` contendo o código fonte em linguagem mnemônica no diretório `.\source\`.
+Para a construção de programas e declaração de dados em linguagem simbólica, é possível utilizar qualquer editor de texto. Para isso, é suficiente salvar o arquivo `.s` contendo o código fonte em linguagem mnemônica no diretório `.\source\`.
 
 Os códigos na linguagem mnemônica definida são compostos de:
 
@@ -205,46 +205,50 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
 
 #### Comandos disponíveis
 
-* `$ HELP` imprime uma descrição detalhada dos possíveis comandos.
+* `> HELP` imprime uma descrição detalhada dos possíveis comandos.
     * Sintaxe:
-        `$ HELP`
+        `> HELP`
 
-* `$ DIR` imprime os nomes dos arquivos disponíveis para `ASM` e `LOAD`.
+* `> DIR` imprime os nomes dos arquivos disponíveis para `ASM` e `LOAD`.
     * Sintaxe:
-        `$ DIR`
+        `> DIR`
 
-* `$ STA` imprime o estado atual dos registradores da máquina virtual.
+* `> STA` imprime o estado atual dos registradores da máquina virtual.
     * Sintaxe:
-        `$ STA`
+        `> STA`
 
-* `$ ASM` monta um arquivo com código em linguagem mnemônica, gerando um arquivo com código objeto em linguagem de máquina pronto para ser carregado. Faz também a ligação com entry-points externos e atualiza a tabela de endereços do ligador.
+* `> ASM` monta um arquivo com código em linguagem mnemônica, gerando um arquivo com código objeto em linguagem de máquina pronto para ser carregado. Faz também a ligação com entry-points externos e atualiza a tabela de endereços do ligador.
     * Sintaxe:
-        `$ ASM FILENAME`
+        `> ASM FILENAME`
 
-* `$ LOAD` carrega uma imagem carregável de memória.
+* `> LOAD` carrega uma imagem carregável de memória.
     * Sintaxe:
-        `$ LOAD FILENAME`
+        `> LOAD FILENAME`
 
-* `$ DUMP` descarrega uma imagem carregável de memória, pronta pra ser carregada pelo loader.
+* `> DUMP` descarrega uma imagem carregável de memória, pronta pra ser carregada pelo loader.
     * Sintaxe:
-        `$ DUMP FILENAME [-s SIZE] [-a ADRESS] [-b BANK] [--hex]`
+        `> DUMP FILENAME [-s SIZE] [-a ADRESS] [-b BANK] [--hex]`
     * Opções:
         * `-s` seleciona o tamanho em bytes de memória a ser descarregada. O valor é de 16 por padrão.
         * `-a` seleciona o endereço inicial de memória a ser descarregado. O valor é de 0x0 por padrão.
         * `-b` seleciona o banco de memória a ser descarregado. O valor é de 0x0 por padrão.
         * `--hex` seleciona se o dumper acionado deve escrever a região de memória em imagem carregável (dumper absoluto) ou em tela (dumper hexadecimal).
 
-* `$ RUN` roda código em linguagem de máquina presente numa posição de memória.
+* `> PRO` imprime os nomes e posições de memória dos programas disponíveis na memória da máquina.
     * Sintaxe:
-        `$ RUN [-a ADRESS] [-b BANK] [--step]`
+        `> PRO`
+
+* `> RUN` roda código em linguagem de máquina presente numa posição de memória.
+    * Sintaxe:
+        `> RUN [-a ADRESS] [-b BANK] [--step]`
     * Opções:
         * `-a` seleciona o endereço inicial de memória do código a ser rodado. O valor é de 0x0 por padrão.
         * `-b` seleciona o banco de memória que contém o código a ser rodado. O valor é de 0x0 por padrão.
         * `--step` seleciona se o código deve ser rodado passo-a-passo. Por padrão, o código é rodado de uma vez.
 
-* `$ EXIT` sai do interpretador de comandos e finaliza o programa.
+* `> EXIT` sai do interpretador de comandos e finaliza o programa.
     * Sintaxe:
-        `$ EXIT`
+        `> EXIT`
 
 --------------------
 
@@ -258,7 +262,7 @@ python main.py
 
 Para explicar o funcionamento da linguagem simbólica e da máquina virtual com mais detalhes, serão apresentados códigos exemplo, construídos na linguagem de montagem definida anteriormente.
 
-* `hello.asm`
+* `hello.s`
 
 Primeiramente, será apresentado o programa mais simples de qualquer linguagem de programação, o "Hello, world!"
 
@@ -320,9 +324,9 @@ Para executar esse programa na máquina virtual, basta seguir a seguinte sequên
 
 ```
 Enter a command! Type HELP to see possible commands.
-$ ASM hello  
-$ LOAD hello
-$ RUN -a 0 -b 0
+> ASM hello  
+> LOAD hello
+> RUN -a 0 -b 0
 ACC => H
 ACC => e
 ACC => l
@@ -339,10 +343,10 @@ ACC => !
 $
 ```
 
-O comando `ASM` serve para montar o programa em linguagem simbólica e gerar o arquivo `hello.obj`, uma imagem carregável de memória dentro da pasta de códigos objetos executáveis. O comando `LOAD` faz a carga do conteúdo dessa imagem na memória da máquina, e o comando `RUN` faz a interpretação e execução das instruções binárias presentes na memória da máquina. Com os comandos acima executados, para um exemplo de utilização do dumper hexadecimal, pode-se usar:
+O comando `ASM` serve para montar o programa em linguagem simbólica e gerar o arquivo `hello.o`, uma imagem carregável de memória dentro da pasta de códigos objetos executáveis. O comando `LOAD` faz a carga do conteúdo dessa imagem na memória da máquina, e o comando `RUN` faz a interpretação e execução das instruções binárias presentes na memória da máquina. Com os comandos acima executados, para um exemplo de utilização do dumper hexadecimal, pode-se usar:
 
 ```
-$ DUMP -a 0 -b 0 --hex 
+> DUMP -a 0 -b 0 --hex 
 Memory bank: 00
 000 => 00
 001 => 13
@@ -371,7 +375,7 @@ Pode-se também utilizar o dumper absoluto:
 DUMP hellodump -a 0 -b 0
 ```
 
-Esse comando gera a imagem carregável `hellodump.obj` no diretório `.\obj\`. Como esperado, os dois primeiros bytes desse arquivo são indicadores do banco e endereço que o código deve começar a ser armazenado na memória. Podemos visualizar o arquivo:
+Esse comando gera a imagem carregável `hellodump.o` no diretório `.\obj\`. Como esperado, os dois primeiros bytes desse arquivo são indicadores do banco e endereço que o código deve começar a ser armazenado na memória. Podemos visualizar o arquivo:
 
 ```
 0000000000000000
@@ -401,7 +405,7 @@ LOAD hellodump
 
 Nenhum erro será exibido, e o código será carregado na memória da máquina na mesma região que foi anteriormente descarregada. Uma vez que o código carregado é o mesmo que foi descarregado e suas posições alvo de memória são idênticas, não há mudanças perceptíveis no estado dos registradores e memória da máquina.
 
-* `somador.asm` e `soma.asm`
+* `somador.s` e `soma.s`
 
 Agora, será apresentado um exemplo mais complexo, que faz o uso do ligador para executar códigos em arquivos separados.
 
@@ -455,11 +459,11 @@ Para executar esse programa na máquina virtual, basta seguir a seguinte sequên
 
 ```
 Enter a command! Type HELP to see possible commands.
-$ ASM somador
-$ LOAD somador
-$ ASM soma
-$ LOAD soma
-$ RUN -a 0 -b 0
+> ASM somador
+> LOAD somador
+> ASM soma
+> LOAD soma
+> RUN -a 0 -b 0
 ACC => 095
 $
 ```

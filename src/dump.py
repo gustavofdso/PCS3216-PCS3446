@@ -6,6 +6,7 @@ def dump(self, filename, size, start_adress, bank):
     bank = self.process_operator(bank)
     size = self.process_operator(size)
 
+    # Checking if data size is too large
     if start_adress + size > len(self.memory[bank]): raise DumpError("Data too large!")
 
     # Dumping bank and memory adress
@@ -16,7 +17,7 @@ def dump(self, filename, size, start_adress, bank):
         obj_code += '{:08b}'.format(self.memory[bank][start_adress + relative_adress].value) + '\n'
 
     # Opening the file writing lines
-    with open('./object/' + filename + '.obj', 'w') as f:
+    with open('./object/' + filename + '.o', 'w') as f:
         f.write(obj_code)
         f.close()
 
@@ -26,6 +27,7 @@ def hex_dump(self, size, start_adress, bank):
     bank = self.process_operator(bank)
     size = self.process_operator(size)
     
+    # Checking if data size is too large
     if start_adress + size > len(self.memory[bank]): raise DumpError("Data too large!")
 
     # Showing bank

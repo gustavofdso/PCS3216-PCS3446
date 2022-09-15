@@ -5,7 +5,7 @@ class AssemblyError(Exception): pass
 # Absolute assembler
 def assemble(self, filename):
     # Opening the file and reading lines
-    with open('./source/' + filename + '.asm', 'r') as f:
+    with open('./source/' + filename + '.s', 'r') as f:
         file_lines = f.readlines()
         f.close()
 
@@ -58,8 +58,8 @@ def assemble(self, filename):
 
         # External label reference
         if command == '<':
-            if label not in self.linker_labels['label'].to_list(): raise AssemblyError('Unkown external reference: ' + label)
-            labels = pd.concat([labels, self.linker_labels[self.linker_labels['label'] == label]])
+            if label not in self.linker['label'].to_list(): raise AssemblyError('Unkown external reference: ' + label)
+            labels = pd.concat([labels, self.linker[self.linker['label'] == label]])
             continue
 
         # Entry point
@@ -116,7 +116,7 @@ def assemble(self, filename):
         # Entry point
         if command == '>':
             if label not in labels['label'].to_list(): raise AssemblyError('Unkown entry point: ' + label)
-            self.linker_labels = pd.concat([self.linker_labels, labels[labels['label'] == label]])
+            self.linker = pd.concat([self.linker, labels[labels['label'] == label]])
             continue
 
         # Program start adress
@@ -147,10 +147,10 @@ def assemble(self, filename):
         else: raise AssemblyError('Bad instruction: ' + command)
 
     # Updating external adresses table
-    self.linker_labels.dropna(inplace = True)
-    self.linker_labels.drop_duplicates('label', inplace = True, keep = 'last')
+    self.linker.dropna(inplace = True)
+    self.linker.drop_duplicates('label', inplace = True, keep = 'last')
 
     # Saving binary to object file
-    with open('./object/' + filename + '.obj', 'w') as f:
+    with open('./object/' + filename + '.o', 'w') as f:
         f.write(obj_code)
         f.close()

@@ -38,7 +38,10 @@ class VirtualMachine:
         )
 
         # Initializing labels for program linking
-        self.linker_labels = pd.DataFrame(columns = ['label', 'adress'])
+        self.linker = pd.DataFrame(columns = ['label', 'adress'])
+
+        # Initializing memory management system
+        self.programs = pd.DataFrame(columns = ['name', 'bank', 'start_adress', 'end_adress'])
 
     # Defining machine instructions
     from src.instructions import (
@@ -54,7 +57,7 @@ class VirtualMachine:
     from src.assemble import assemble
 
     # Defining machine utils
-    from src.utils import get_target_adress, process_operator, show_status, show_files
+    from src.utils import get_target_adress, process_operator, show_status, show_files, show_programs
 
     # Defining machine execution algorithm
     from src.execute import fetch_instruction, execute_instruction, run_code
@@ -63,7 +66,7 @@ class VirtualMachine:
     def run(self):
         print('Enter a command! Type HELP to see possible commands.')
         while True:
-            msg = input('$ ').split()
+            msg = input('> ').split()
             if len(msg) == 0: continue
             command = msg[0].upper()
             parser = argparse.ArgumentParser()
@@ -73,32 +76,34 @@ class VirtualMachine:
                     print(
 """
 * HELP          - Briefs the commands.
-    usage: $ HELP
+    usage: > HELP
 * DIR           - Lists available files.
-    usage: $ DIR
+    usage: > DIR
 * STA           - Shows the current status for the virtual machine's registers.
-    usage: $ STA
+    usage: > STA
 * ASM           - Assembles a source code file.
-    usage: $ ASM FILENAME
+    usage: > ASM FILENAME
 * LOAD          - Loads a file into memory.
-    usage: $ LOAD FILENAME
+    usage: > LOAD FILENAME
 * DUMP          - Dumps a file from memory.
-    usage: $ DUMP FILENAME [-s SIZE] [-a ADRESS] [-b BANK] [--hex]
+    usage: > DUMP FILENAME [-s SIZE] [-a ADRESS] [-b BANK] [--hex]
 
     options:
         -s      Selects the size for the code in bytes. Default 16.
         -a      Selects the start adress for the code. Default 0x0.
         -b      Selects the memory bank for the code. Default 0.
         --hex   Selects if the dump should be binary to file or hexadecimal to screen. Default False.
-* RUN       - Run code.
-    usage: $ RUN [-a ADRESS] [-b BANK] [--step]
+* PRO           - Shows programs currently available in memory.
+    usage: > PRO
+* RUN           - Run code in memory.
+    usage: > RUN [-a ADRESS] [-b BANK] [--step]
 
     options:
         -a      Selects the start adress for the code. Default 0x0.
         -b      Selects the memory bank for the code. Default 0.
         --step  Selects if the code should be run step by step. Default False.
-* EXIT      - Stops the command interpreter.
-    usage: $ EXIT
+* EXIT          - Stops the command interpreter.
+    usage: > EXIT
 """
                     )
 
@@ -132,6 +137,10 @@ class VirtualMachine:
                     kwargs = vars(kwargs)
                     if kwargs['hex']: self.hex_dump(kwargs['s'], kwargs['a'], kwargs['b'])
                     else: self.dump(args[1], kwargs['s'],  kwargs['a'], kwargs['b'])
+
+                # PRO command
+                elif command == 'PRO':
+                    self.show_programs()
 
                 # RUN command
                 elif command == 'RUN':
