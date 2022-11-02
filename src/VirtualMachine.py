@@ -4,10 +4,16 @@ from ctypes import c_uint8, c_uint16, c_int8
 
 class VirtualMachine:
     def __init__(self, banks = 16, bank_size = 4096):
+        self.banks = banks
+        self.bank_size = bank_size
+
+        self.refresh()
+
+    def refresh(self):
         # Initializing system memory
         self.indirect_mode = False
         self.current_bank = c_uint8(0)
-        self.memory = [[c_uint8(0) for i in range(bank_size)] for j in range(banks)]
+        self.memory = [[c_uint8(0) for i in range(self.bank_size)] for j in range(self.banks)]
         
         # Initializing system registers
         self.program_counter = c_uint16(0)
@@ -40,9 +46,6 @@ class VirtualMachine:
         # Initializing labels for program linking
         self.linker = pd.DataFrame(columns = ['label', 'adress'])
 
-        # Initializing memory management system
-        self.programs = pd.DataFrame(columns = ['name', 'bank', 'start_adress', 'end_adress'])
-
     # Defining machine instructions
     from src.instructions import (
         _jump, _jump_if_zero, _jump_if_negative, _load_value,
@@ -55,9 +58,10 @@ class VirtualMachine:
     from src.load import load
     from src.dump import dump, hex_dump
     from src.assemble import assemble
+    from src.jobscheduler import job_scheduler
 
     # Defining machine utils
-    from src.utils import get_target_adress, process_operator, show_status, show_files, show_programs
+    from src.utils import get_target_adress, process_operator, show_status, show_files
 
     # Defining machine execution algorithm
     from src.execute import fetch_instruction, execute_instruction, run_code
@@ -77,14 +81,22 @@ class VirtualMachine:
 """
 * HELP          - Briefs the commands.
     usage: > HELP
+
+* REF           - Refresh machine.
+    usage: > REF
+
 * DIR           - Lists available files.
     usage: > DIR
+
 * STA           - Shows the current status for the virtual machine's registers.
     usage: > STA
+
 * ASM           - Assembles a source code file.
     usage: > ASM FILENAME
+
 * LOAD          - Loads a file into memory.
     usage: > LOAD FILENAME
+
 * DUMP          - Dumps a file from memory.
     usage: > DUMP FILENAME [-s SIZE] [-a ADRESS] [-b BANK] [--hex]
 
@@ -93,8 +105,7 @@ class VirtualMachine:
         -a      Selects the start adress for the code. Default 0x0.
         -b      Selects the memory bank for the code. Default 0.
         --hex   Selects if the dump should be binary to file or hexadecimal to screen. Default False.
-* PRO           - Shows programs currently available in memory.
-    usage: > PRO
+
 * RUN           - Run code in memory.
     usage: > RUN [-a ADRESS] [-b BANK] [--step]
 
@@ -102,13 +113,26 @@ class VirtualMachine:
         -a      Selects the start adress for the code. Default 0x0.
         -b      Selects the memory bank for the code. Default 0.
         --step  Selects if the code should be run step by step. Default False.
+
+* JOB           - Initializes job scheduler.
+    usage: > JOB FILENAME [-n LEVEL] [-i IN] [-o OUT]
+
+    options:
+        -n      Multiprogramming level. Default 1
+        -i      In delay. Default 13
+        -o      Out delay. Default 17
+
 * EXIT          - Stops the command interpreter.
     usage: > EXIT
 """
                     )
 
+                # REF command
+                if command == 'REF':
+                    self.refresh()
+
                 # DIR command
-                if command == 'DIR':
+                elif command == 'DIR':
                     self.show_files()
 
                 # STA command
@@ -138,10 +162,6 @@ class VirtualMachine:
                     if kwargs['hex']: self.hex_dump(kwargs['s'], kwargs['a'], kwargs['b'])
                     else: self.dump(args[1], kwargs['s'],  kwargs['a'], kwargs['b'])
 
-                # PRO command
-                elif command == 'PRO':
-                    self.show_programs()
-
                 # RUN command
                 elif command == 'RUN':
                     parser.add_argument('-a', default = '0', type = str)
@@ -155,6 +175,15 @@ class VirtualMachine:
                 elif command == 'EXIT':
                     print('Exiting command interpreter!')
                     break
+
+                # JOB command
+                elif command == 'JOB':
+                    parser.add_argument('-n', default = 1, type = int)
+                    parser.add_argument('-i', default = 13, type = int)
+                    parser.add_argument('-o', default = 17, type = int)
+                    kwargs, args = parser.parse_known_args(msg)
+                    kwargs = vars(kwargs)
+                    self.job_scheduler(args[1], kwargs['n'], kwargs['i'], kwargs['o'])
 
                 else:
                     print("Invalid command! Type HELP to see possible commands.")

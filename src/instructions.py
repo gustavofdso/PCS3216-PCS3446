@@ -96,7 +96,7 @@ def _put_data(self):
     elif operand == 0b0010:
         print('ACC => 0x{:02X}'.format(self.accumulator.value))
 
-    # Character form
+    # ASCII form
     elif operand == 0b0011:
         print('ACC => {:c}'.format(self.accumulator.value))
     

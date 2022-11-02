@@ -1,5 +1,3 @@
-import pandas as pd
-
 class LoadError(Exception): pass
 
 # Absolute loader
@@ -23,22 +21,3 @@ def load(self, filename):
     for i in splitted_code[2:]:
         self.memory[bank][start_adress + relative_adress].value = int(i, 2)
         relative_adress += 1
-
-    # Saving program position
-    self.programs = pd.concat(
-        [
-            self.programs,
-            pd.DataFrame(
-                {
-                    'name': [filename],
-                    'bank': [bank],
-                    'start_adress': [start_adress],
-                    'end_adress': [relative_adress - 1]
-                }
-            )
-        ], ignore_index = True
-    )
-
-    # Updating external adresses table
-    self.programs.dropna(inplace = True)
-    self.programs.drop_duplicates('name', inplace = True, keep = 'last')

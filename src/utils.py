@@ -26,29 +26,19 @@ def show_status(self):
     print('\tRI  => 0x{:04X}'.format(self.instruction_register.value))
     print('\tLR  => 0x{:04X}'.format(self.link_register.value))
 
-# Showing available files for ASM and LOAD
+# Showing available files for ASM, LOAD and JOB
 def show_files(self):
     # Showing ASM files
-    path_source = './source/'
     print('Available files for ASM:')
-    for filename in os.listdir(path_source):
+    for filename in os.listdir('./source/'):
         if '.s' in filename.lower(): print('\t' + filename.lower().replace('.s', ''))
     
-    # Showing OBJ files
-    path_object = './object/'
+    # Showing LOAD files
     print('\nAvailable files for LOAD:')
-    for filename in os.listdir(path_object):
+    for filename in os.listdir('./object/'):
         if '.o' in filename.lower(): print('\t' + filename.lower().replace('.o', ''))
 
-# Showing current loaded programs
-def show_programs(self):
-    if self.programs.empty:
-        print('No loaded programs!')
-        return
-
-    for index, row in self.programs.iterrows():
-        print('\tName:', row['name'])
-        print('\tBank:', '0x{:01X}'.format(row['bank']))
-        print('\tStart Adress:', '0x{:03X}'.format(row['start_adress']))
-        print('\tEnd Adress:', '0x{:03X}'.format(row['end_adress']))
-        print('\n')
+    # Showing JOB files
+    print('\nAvailable files for JOB:')
+    for filename in os.listdir('./jobs/'):
+        if '.csv' in filename.lower(): print('\t' + filename.lower().replace('.csv', ''))

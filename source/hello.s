@@ -5,7 +5,7 @@
             @       /0000           ; endereço inicial do código na memória
             JP      START           ; iniciando a execução do programa
 
-STRING      K       =72             ; declaração da string, em formato unicode
+STRING      K       =72             ; declaração da string, em formato ASCII
             K       =101
             K       =108
             K       =108
@@ -28,7 +28,7 @@ START       LV      =0
             HM      /01             ; ligando o modo de endereçamento indireto
             LD      ADDR            ; carregando o caracter atual
             JZ      END             ; se zero, ir para END
-            PD      =3              ; imprimir dado em formato unicode
+            PD      =3              ; imprimir dado em formato ASCII
             LD      CURR            ; incrementando CURR
             +       ONE
             MM      CURR

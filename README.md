@@ -139,7 +139,7 @@ A máquina virtual é capaz de montar programas em linguagem simbólica. Para is
         * `0000` => Imprime o dado em formato decimal.
         * `0001` => Imprime o dado em formato binário.
         * `0010` => Imprime o dado em formato hexadecimal.
-        * `0011` => Imprime o dado em formato unicode.
+        * `0011` => Imprime o dado em formato ASCII.
 
 * `OS` OPERATING SYSTEM - imprime na tela o estado atual da máquina, ou encerra a execução do programa.
     * Estrutura:
@@ -209,6 +209,10 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
     * Sintaxe:
         `> HELP`
 
+* `> REF` reinicia a memória e processador da máquina.
+    * Sintaxe:
+        `> REF`
+
 * `> DIR` imprime os nomes dos arquivos disponíveis para `ASM` e `LOAD`.
     * Sintaxe:
         `> DIR`
@@ -246,6 +250,15 @@ A interação entre o operador da máquina e o fluxo de dados interno é dado po
         * `-b` seleciona o banco de memória que contém o código a ser rodado. O valor é de 0x0 por padrão.
         * `--step` seleciona se o código deve ser rodado passo-a-passo. Por padrão, o código é rodado de uma vez.
 
+* `> JOB` inicia o escalonador de processos.
+    * Sintaxe:
+        `> JOB FILENAME [-n LEVEL] [-i IN] [-o OUT]`
+
+    * Opções:
+        * `-n` Grau de multiprogramação. O valor é 1 por padrão.
+        * `-i` In delay. O valor é 13 por padrão.
+        * `-o` Out delay. O valor é 17 por padrão.
+
 * `> EXIT` sai do interpretador de comandos e finaliza o programa.
     * Sintaxe:
         `> EXIT`
@@ -279,10 +292,10 @@ Como esse programa não se utilizado de endereços externos, não é necessária
             JP      START           ; iniciando a execução do programa
 ```
 
-São declarados os dados da string em bytes em formato unicode. O zero demarca o fim da string.
+São declarados os dados da string em bytes em formato ASCII. O zero demarca o fim da string.
 
 ```
-STRING      K       =72             ; declaração da string, em formato unicode
+STRING      K       =72             ; declaração da string, em formato ASCII
             K       =101
             K       =108
             K       =108
@@ -309,7 +322,7 @@ START       LV      =0
             HM      /01             ; ligando o modo de endereçamento indireto
             LD      ADDR            ; carregando o caractere atual
             JZ      END             ; se zero, ir para END
-            PD      =3              ; imprimir dado em formato unicode
+            PD      =3              ; imprimir dado em formato ASCII
             LD      CURR            ; incrementando CURR
             +       ONE
             MM      CURR
