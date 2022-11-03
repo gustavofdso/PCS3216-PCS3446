@@ -9,11 +9,11 @@ def job_scheduler(self, filename, n, i, o):
     df['left'] = df['duration']
 
     time = 0
-    df.sort_values('start', inplace = True)
+    df.sort_values('arrival', inplace = True)
     memory = pd.DataFrame(columns = ['time', 'process', 'memory'])
     while not (df['left'] == 0).all():
         # Running n processes
-        processes = df[(df['start'] <= time) & (df['left'] != 0)].head(n)
+        processes = df[(df['arrival'] <= time) & (df['left'] != 0)].head(n)
         processes['left'] -= 1
         df = pd.concat([processes, df[~df.index.isin(processes.index)]])
 
@@ -27,5 +27,11 @@ def job_scheduler(self, filename, n, i, o):
 
     # Plotting memory graph
     memory = memory.pivot_table(index = 'time', columns = 'process', values = 'memory')
-    memory.plot.area(stacked = True, title = 'Memória utilizada - n = {n}'.format(n = n), grid = True, linewidth = 0)
+    memory.plot.area(
+        title = f'Multiprogramação - n = {n}',
+        xlabel = 'Ciclos',
+        ylabel = 'Memória',
+        grid = True,
+        linewidth = 0,
+    )
     plt.show()
